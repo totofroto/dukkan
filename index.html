@@ -612,6 +612,8 @@ const SFX = {
 };
 
 /* ================= Voice: human neural clips → family recordings → device TTS ================= */
+const VOICE_BASE = "voice/";
+let VM = null;   // manifest: {ar:{key:text}, en:{...}, de:{...}}
 let voices = [];
 function loadVoices(){ if("speechSynthesis" in window){ voices = speechSynthesis.getVoices(); renderVoiceInfo(); } }
 if("speechSynthesis" in window){ loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
@@ -620,8 +622,6 @@ function ttsSay(text){
   if(!S.voice || !text) return; const v = voiceFor(S.lang); if(!v) return;
   try{ speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.voice=v; u.lang=v.lang; u.rate=.98; u.pitch=1.1; speechSynthesis.speak(u); }catch(e){}
 }
-const VOICE_BASE = "voice/";
-let VM = null;   // manifest: {ar:{key:text}, en:{...}, de:{...}}
 fetch(VOICE_BASE+"manifest.json").then(r=>r.ok?r.json():null).then(m=>{ VM = m; renderVoiceInfo(); }).catch(()=>{});
 const bufCache = new Map();
 function clipBuf(lang, key){
