@@ -223,6 +223,10 @@ img.fx{width:1em;height:1em;object-fit:contain;vertical-align:-.14em;display:inl
 .rec{border-color:var(--pom);color:var(--pom)}
 .rec.on{background:var(--pom);color:#fff;animation:pulse 1s infinite}
 @keyframes pulse{50%{opacity:.6}}
+[data-say]{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.said{animation:said .45s ease-out}
+@keyframes said{40%{transform:scale(1.06)}}
+.tapw{display:contents}
 canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:25;width:100%;height:100%}
 
 @media (max-width:980px){ .modes button .ml{display:none} .modes button{padding:0 12px} }
@@ -244,7 +248,7 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:25;width:100%;heigh
 
 <div class="app" id="app">
   <header class="top">
-    <div class="sign"><span class="logo" aria-hidden="true">🧺</span><h1 class="brand" id="brand"></h1></div>
+    <div class="sign" data-say="welcome" data-fb=""><span class="logo" aria-hidden="true">🧺</span><h1 class="brand" id="brand"></h1></div>
     <nav class="modes" id="modes" aria-label="Mode"></nav>
     <div class="tools">
       <div class="langs" role="group" aria-label="Language" id="langsTop"></div>
@@ -706,7 +710,7 @@ const V = {
   product: code => ()=>{
     const [e,p] = PRODUCTS[code];
     const others = Object.keys(LANG_IDX).filter(l=>l!==S.lang).map(l=>'<span><b>'+L[l].label+'</b>'+esc(pname(code,l))+'</span>').join("");
-    return '<div class="big-emoji">'+e+'</div><p class="big-name">'+esc(pname(code))+'</p><div class="also">'+others+'</div><div class="tag">'+p+' <span class="s">★</span></div>';
+    return '<div class="big-emoji" data-say="p_'+code+' n_'+p+'" data-fb="'+esc(pname(code))+'">'+e+'</div><p class="big-name" data-say="p_'+code+' n_'+p+'" data-fb="'+esc(pname(code))+'">'+esc(pname(code))+'</p><div class="also">'+others+'</div><div class="tag" data-say="n_'+p+'" data-fb="'+p+'">'+p+' <span class="s">★</span></div>';
   },
   msg: (emoji, title, hint, tag) => ()=>'<div class="big-emoji">'+emoji+'</div><p class="big-name">'+title()+'</p>'+(hint?'<p class="hint">'+hint()+'</p>':'')+(tag?'<div class="tag ok">'+tag()+' <span class="s">★</span></div>':''),
   clinicIdle: ()=>'<div class="big-emoji">🏥</div><p class="hint">'+T().clinic.idle+'</p>',
@@ -714,14 +718,15 @@ const V = {
     const c = clinic, t = T().clinic, [pe] = PATIENTS[c.patient];
     const slots = c.ail.need.map(m=>{
       const got = c.got.includes(m);
-      return '<div class="slot '+(got?"filled":(c.hint?"ghost":""))+'">'+(got||c.hint ? MEDS[m][0] : "?")+'</div>';
+      return '<div class="slot '+(got?"filled":(c.hint?"ghost":""))+'"'+(got||c.hint ? ' data-say="med_'+m+'" data-fb="'+esc(medName(m))+'"' : '')+'>'+(got||c.hint ? MEDS[m][0] : "?")+'</div>';
     }).join("");
-    return '<div class="big-emoji">'+pe+'</div><p class="big-name">'+esc(patName(c.patient))+'</p>'+
-      '<div class="bubble"><span>'+c.ail.e+'</span><span>'+esc(ailName(c.ail))+'</span></div>'+
+    const caseSay = 'pat_'+c.patient+' diag ail_'+AILMENTS.indexOf(c.ail)+' whatNeeds', caseFb = esc(patName(c.patient)+'. '+ailName(c.ail));
+    return '<div class="tapw" data-say="'+caseSay+'" data-fb="'+caseFb+'"><div class="big-emoji">'+pe+'</div><p class="big-name">'+esc(patName(c.patient))+'</p>'+
+      '<div class="bubble"><span>'+c.ail.e+'</span><span>'+esc(ailName(c.ail))+'</span></div></div>'+
       '<div class="slots">'+slots+'</div><p class="hint">'+t.needs+'</p>'+
       (c.hint?'':'<div class="choice"><button class="pill light" type="button" data-act="clinicHint">'+t.hint+'</button></div>');
   },
-  clinicHealed: code => ()=>'<div class="big-emoji">'+PATIENTS[code][0]+'</div><p class="big-name">'+esc(T().clinic.healed(patName(code)))+'</p><div class="mid-emoji">🩷✨</div>',
+  clinicHealed: code => ()=>'<div class="big-emoji" data-say="healedPre pat_'+code+' healedPost" data-fb="'+esc(patName(code))+'">'+PATIENTS[code][0]+'</div><p class="big-name">'+esc(T().clinic.healed(patName(code)))+'</p><div class="mid-emoji">🩷✨</div>',
   huntSetup: ()=>{
     const t = T().treasure;
     return '<div class="big-emoji">🗺️</div><p class="big-name">'+t.setup+'</p><div class="choice">'+
@@ -732,7 +737,7 @@ const V = {
     const h = hunt, t = T().treasure, code = h.route[h.idx], last = h.route[h.route.length-1];
     const dots = h.route.map((_,i)=>'<i class="'+(i<h.idx?"done":(i===h.idx?"now":""))+'"></i>').join("");
     return '<div class="dots" aria-hidden="true">'+dots+'</div><p class="hint">'+t.clue+' '+(h.idx+1)+' / '+h.route.length+'</p>'+
-      '<div class="riddle">'+esc(riddle(code))+'</div>'+
+      '<div class="riddle" data-say="clue_'+code+'" data-fb="'+esc(riddle(code))+'">'+esc(riddle(code))+'</div>'+
       (h.hint?'<div class="mid-emoji">'+SPOTS[code][0]+'</div>':'')+
       '<div class="choice">'+(h.hint?'':'<button class="pill light" type="button" data-act="huntHint">'+t.hint+'</button>')+
       '<button class="pill light" type="button" data-act="huntParents">'+t.parents+'</button></div>'+
@@ -772,11 +777,14 @@ function render(){
   if(S.mode==="shop"){
     const v = total();
     $("lcdLabel").textContent = t.total; $("lcdValue").textContent = v; $("lcdUnit").textContent = "★";
+    const lc = document.querySelector(".lcd"); lc.dataset.say = "n_"+v; lc.dataset.fb = t.stars(v);
     $("lcdSub").textContent = cash>0 ? t.cashLine(cash, Math.max(0,v-cash)) : (pending ? (pending.type==="bonus"?t.pendBonus:t.pendBalance) : "");
   }else if(S.mode==="clinic"){
+    delete document.querySelector(".lcd").dataset.say;
     const n = Object.values(S.healed).reduce((a,b)=>a+b,0);
     $("lcdLabel").textContent = t.clinic.healedToday; $("lcdValue").textContent = n; $("lcdUnit").textContent = "🩷"; $("lcdSub").textContent = "";
   }else{
+    if(hunt && !hunt.done){ const lc = document.querySelector(".lcd"); lc.dataset.say = "clue_"+hunt.route[hunt.idx]; lc.dataset.fb = riddle(hunt.route[hunt.idx]); } else delete document.querySelector(".lcd").dataset.say;
     $("lcdLabel").textContent = t.treasure.clue; $("lcdUnit").textContent = "🗺️";
     $("lcdValue").textContent = hunt ? Math.min(hunt.idx+1, hunt.route.length)+"/"+hunt.route.length : "–";
     $("lcdSub").textContent = hunt && !hunt.done ? t.treasure.left(hunt.route.length-hunt.idx) : "";
@@ -786,7 +794,7 @@ function render(){
   $("bank").innerHTML = Object.keys(KIDS).map(code=>{
     const h = S.history.find(x=>x.kid===code);
     const last = h ? (h.amount>0?"+":"")+h.amount+" ★  "+txLabel(h) : t.noTx;
-    return '<div class="card '+KIDS[code].cls+'" id="card'+code+'"><span class="chipm" aria-hidden="true"></span>'+
+    return '<div class="card '+KIDS[code].cls+'" id="card'+code+'" data-say="bal_'+code+' n_'+S.balances[code]+'" data-fb="'+esc(t.balanceOf(kname(code))+' '+t.stars(S.balances[code]))+'"><span class="chipm" aria-hidden="true"></span>'+
       '<div class="ctext"><div class="who">'+esc(kname(code))+'</div><div class="last">'+esc(last)+'</div></div>'+
       '<div class="bal">'+S.balances[code]+' <span class="st">★</span></div></div>';
   }).join("");
@@ -798,19 +806,19 @@ function renderSide(){
     if(mission){
       const done = mission.items.every(c=>mission.got.includes(c));
       m = '<div class="mission"><div class="mt"><span>🎯 '+t.missionTitle+'</span><span>+'+MISSION_BONUS+' ★</span></div><div class="chips">'+
-        mission.items.map(c=>'<span class="chip-i '+(mission.got.includes(c)?"got":"")+'">'+PRODUCTS[c][0]+' '+esc(pname(c))+'</span>').join("")+'</div>'+
+        mission.items.map(c=>'<span class="chip-i '+(mission.got.includes(c)?"got":"")+'" data-say="p_'+c+'" data-fb="'+esc(pname(c))+'">'+PRODUCTS[c][0]+' '+esc(pname(c))+'</span>').join("")+'</div>'+
         '<div class="small">'+(done?t.missionDone:t.missionHint)+'</div></div>';
     }
     const items = !cart.length ? '<li class="empty"><span class="ee">🧾</span><b>'+t.emptyBill+'</b><span>'+t.emptyBillHint+'</span></li>'
-      : cart.map((c,i)=>'<li class="'+(i===cart.length-1?"new":"")+'"><span class="e">'+PRODUCTS[c][0]+'</span><span class="n">'+esc(pname(c))+'</span><span class="p star">'+PRODUCTS[c][1]+'</span></li>').join("");
+      : cart.map((c,i)=>'<li class="'+(i===cart.length-1?"new":"")+'" data-say="p_'+c+' n_'+PRODUCTS[c][1]+'" data-fb="'+esc(pname(c))+'"><span class="e">'+PRODUCTS[c][0]+'</span><span class="n">'+esc(pname(c))+'</span><span class="p star">'+PRODUCTS[c][1]+'</span></li>').join("");
     side.innerHTML = fx('<div class="rhead"><h2>'+t.receipt+'</h2><span class="rno">#'+String(S.receiptNo).padStart(4,"0")+'</span></div>'+
       '<div class="rsub">'+(cart.length?t.items(cart.length):"")+'</div>'+m+'<ul class="items" id="items">'+items+'</ul>'+
-      '<div class="sum"><span>'+t.sum+'</span><span>'+t.stars(total())+'</span></div>');
+      '<div class="sum" data-say="n_'+total()+'" data-fb="'+esc(t.stars(total()))+'"><span>'+t.sum+'</span><span>'+t.stars(total())+'</span></div>');
     const it = $("items"); it.scrollTop = it.scrollHeight;
   }else if(S.mode==="clinic"){
     const list = Object.keys(PATIENTS).map(c=>{
       const n = S.healed[c]||0, now = clinic && clinic.patient===c;
-      return '<li class="'+(now?"new":"")+'"><span class="e">'+PATIENTS[c][0]+'</span><span class="n">'+esc(patName(c))+'</span><span class="p">'+(n?t.clinic.sticker(n):"–")+'</span></li>';
+      return '<li class="'+(now?"new":"")+'" data-say="pat_'+c+'" data-fb="'+esc(patName(c))+'"><span class="e">'+PATIENTS[c][0]+'</span><span class="n">'+esc(patName(c))+'</span><span class="p">'+(n?t.clinic.sticker(n):"–")+'</span></li>';
     }).join("");
     side.innerHTML = fx('<div class="rhead"><h2>'+t.clinic.side+'</h2><span class="rno">🩺</span></div><div class="rsub"></div><ul class="items">'+list+'</ul>'+
       '<div class="sum"><span>'+t.clinic.healedToday+'</span><span>'+Object.values(S.healed).reduce((a,b)=>a+b,0)+' 🩷</span></div>');
@@ -1025,6 +1033,18 @@ function handleTreasure(code, act){
   err(()=>T().unknown(code), T().say.unknown);
 }
 
+/* tap-to-hear */
+document.addEventListener("click", e=>{
+  if(!e.target.closest) return;
+  const el = e.target.closest("[data-say]");
+  if(!el || e.target.closest("button")) return;
+  if(!$("startOv").hidden) return;
+  audio();
+  const toks = el.dataset.say.split(" ").filter(Boolean);
+  speak(toks, el.dataset.fb || (el.dataset.say==="welcome" ? T().say.welcome : ""));
+  el.classList.remove("said"); void el.offsetWidth; el.classList.add("said");
+});
+
 /* stage buttons */
 document.addEventListener("click", e=>{
   const b = e.target.closest && e.target.closest("[data-act]"); if(!b) return;
@@ -1100,7 +1120,7 @@ $("fsBtn").onclick = async ()=>{
 document.addEventListener("click", e=>{
   const lb = e.target.closest && e.target.closest("[data-lang]");
   if(lb){ S.lang = lb.dataset.lang; save(); applyLang(); if($("startOv").hidden){ audio(); SFX.soft(); warmVoices(); } return; }
-  const mb = e.target.closest && e.target.closest("[data-mode]");
+  const mb = e.target.closest && e.target.closest("button[data-mode]");
   if(mb){ audio(); setMode(mb.dataset.mode); mb.blur && mb.blur(); }
 });
 

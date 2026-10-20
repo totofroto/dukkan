@@ -1,5 +1,5 @@
 // Offline support: the game shell is network-first (so updates arrive), assets are cache-first.
-const SHELL = "dukkan-shell-v5";
+const SHELL = "dukkan-shell-v6";
 const ASSETS = "dukkan-assets-v4";
 const CORE = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "voice/manifest.json"];
 
