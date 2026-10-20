@@ -1,0 +1,1069 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>دكان فاطمة وسماء</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#2A1B4A">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Baloo+Bhaijaan+2:wght@600;800&family=Readex+Pro:wght@400;500;700&display=swap">
+<style>
+[hidden]{display:none!important}
+img{max-width:100%}
+
+/* Sugar Ledger, v3. A toy market stall that can turn into a clinic or a treasure map.
+   Awning over a stage where the action bursts in on a saffron sunburst; a plum display above it;
+   a side sheet (receipt / patient chart / map) beside it; the girls' two bank cards along the bottom.
+   Single deliberate bright look. */
+:root{
+  --ground:#EEE6FF; --ground-dot:#DCCEFF; --paper:#FFFFFF;
+  --ink:#2A1B4A; --ink-soft:#6B5A8E;
+  --pom:#F0374F; --pom-deep:#C21F38; --awning-light:#FFE3E8;
+  --saffron:#FFB627; --saffron-soft:#FFE29A;
+  --mint:#1FC3A4; --mint-deep:#0E8F78; --sky:#4BA3FF; --sky-deep:#1F6FD1;
+  --lcd:#241640; --lcd-glow:#8CFFD9;
+  --line:#E6DDF7;
+  --fatima-a:#8E4DFF; --fatima-b:#E0479E;
+  --sama-a:#13B6A5; --sama-b:#3D8BFF;
+  --ok:#17A866;
+  --mode:var(--pom); --mode-deep:var(--pom-deep); --mode-soft:var(--awning-light); --burst:var(--saffron-soft);
+  --display-ar:"Baloo Bhaijaan 2","Baloo 2","Readex Pro",system-ui,sans-serif;
+  --display-lat:"Baloo 2","Baloo Bhaijaan 2","Readex Pro",system-ui,sans-serif;
+  --body:"Readex Pro",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;
+  --display:var(--display-ar);
+  color-scheme:light;
+}
+:root[lang="en"],:root[lang="de"]{--display:var(--display-lat)}
+body[data-mode="clinic"]{--mode:var(--mint);--mode-deep:var(--mint-deep);--mode-soft:#DDF8F1;--burst:#C9F5EA}
+body[data-mode="treasure"]{--mode:var(--sky);--mode-deep:var(--sky-deep);--mode-soft:#DCEBFF;--burst:#FFE29A}
+html,body{height:100%}
+body{margin:0;color:var(--ink);font-family:var(--body);font-size:16px;overflow:hidden;
+  background:var(--ground) radial-gradient(circle,var(--ground-dot) 1.6px,transparent 1.8px) 0 0/26px 26px}
+*{box-sizing:border-box}
+button{font-family:inherit;cursor:pointer;color:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--saffron);outline-offset:3px}
+
+.app{height:100%;display:grid;grid-template-rows:auto 1fr auto;gap:12px;
+  padding-block:12px 14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* ---------- header ---------- */
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.sign{display:flex;align-items:center;gap:10px;background:var(--pom);color:#fff;border-radius:16px;padding:6px 18px 4px;box-shadow:0 5px 0 var(--pom-deep);transform:rotate(-1.2deg)}
+.sign .logo{font-size:1.6rem;line-height:1}
+.brand{font-family:var(--display);font-weight:800;font-size:clamp(1.25rem,2.5vw,1.9rem);line-height:1.15;margin:0;white-space:nowrap}
+.modes{display:flex;gap:6px;background:var(--paper);padding:5px;border-radius:18px;box-shadow:0 3px 0 var(--line)}
+.modes button{border:0;background:transparent;border-radius:13px;height:44px;padding:0 14px;display:flex;align-items:center;gap:7px;font-weight:700;font-size:.98rem}
+.modes button .me{font-size:1.35rem}
+.modes button[aria-pressed="true"]{background:var(--mode);color:#fff;box-shadow:0 3px 0 var(--mode-deep)}
+.tools{margin-inline-start:auto;display:flex;align-items:center;gap:10px}
+.langs{display:flex;background:var(--paper);border-radius:999px;padding:4px;gap:2px;box-shadow:0 3px 0 var(--line)}
+.langs button{border:0;background:transparent;border-radius:999px;min-width:46px;height:38px;padding:0 12px;font-weight:700;font-size:.95rem}
+.langs button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.iconbtn{border:0;background:var(--paper);width:46px;height:46px;border-radius:14px;font-size:1.25rem;display:grid;place-items:center;box-shadow:0 3px 0 var(--line)}
+.iconbtn:active,.langs button:active,.modes button:active{transform:translateY(2px)}
+
+/* ---------- main ---------- */
+.main{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px;min-height:0}
+.stagecol{display:grid;grid-template-rows:auto 1fr;gap:12px;min-height:0}
+.lcd{background:var(--lcd);color:var(--lcd-glow);border-radius:22px;padding:12px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;
+  box-shadow:inset 0 0 0 4px #1A0F31, inset 0 10px 30px #0000006b, 0 6px 0 #170D2B}
+.lcd .label{font-size:.95rem;color:#CDBDF3}
+.lcd .cash{font-size:.95rem;color:var(--saffron);min-height:1.3em;margin-top:2px}
+.lcd .amount{display:flex;align-items:baseline;gap:8px;direction:ltr}
+.lcd .total{font-family:var(--display-lat);font-weight:800;font-size:clamp(2.4rem,5.6vw,4rem);line-height:.95;font-variant-numeric:tabular-nums;text-shadow:0 0 18px #8CFFD966}
+.lcd .unit{font-size:clamp(1.5rem,3.2vw,2.2rem);color:var(--saffron);text-shadow:0 0 14px #FFB62788}
+
+.stage{position:relative;background:var(--paper);border-radius:26px;overflow:hidden;display:grid;place-items:center;text-align:center;padding:64px 20px 22px;min-height:0;box-shadow:0 6px 0 var(--line)}
+.awning{position:absolute;inset:0 0 auto 0;height:52px;z-index:2;pointer-events:none}
+.awning::before{content:"";position:absolute;inset:0 0 auto 0;height:30px;background:repeating-linear-gradient(90deg,var(--mode) 0 44px,var(--mode-soft) 44px 88px)}
+.awning::after{content:"";position:absolute;inset:30px 0 auto 0;height:22px;
+  background:radial-gradient(circle at 22px 0,var(--mode) 21px,transparent 22px),radial-gradient(circle at 66px 0,var(--mode-soft) 21px,transparent 22px);
+  background-size:88px 22px;filter:drop-shadow(0 3px 0 #2A1B4A14)}
+.burst{position:absolute;width:min(78vmin,620px);aspect-ratio:1;max-width:120%;border-radius:50%;top:56%;left:50%;translate:-50% -50%;
+  background:repeating-conic-gradient(var(--burst) 0 9deg,transparent 9deg 18deg);
+  -webkit-mask:radial-gradient(circle,#000 0 38%,#0000 70%);mask:radial-gradient(circle,#000 0 38%,#0000 70%);opacity:.9;animation:spin 60s linear infinite}
+@keyframes spin{to{rotate:360deg}}
+.stage-inner{position:relative;z-index:1;display:grid;justify-items:center;gap:6px;width:100%;max-height:100%;overflow:auto}
+.big-emoji{font-size:clamp(4.6rem,13vw,9.5rem);line-height:1.05;filter:drop-shadow(0 14px 12px #2A1B4A2e)}
+.mid-emoji{font-size:clamp(3rem,8vw,5.5rem);line-height:1.05}
+.big-name{font-family:var(--display);font-weight:800;font-size:clamp(1.8rem,4.4vw,3rem);line-height:1.15;margin:0;text-wrap:balance}
+.also{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.also span{background:var(--ground);border-radius:999px;padding:3px 12px;font-size:.95rem}
+.also span b{font-weight:500;color:var(--ink-soft);margin-inline-end:6px;font-size:.78rem}
+.tag{position:relative;display:inline-flex;align-items:center;gap:6px;margin-top:8px;background:var(--pom);color:#fff;font-family:var(--display-lat);font-weight:800;
+  font-size:clamp(1.5rem,3.4vw,2.4rem);line-height:1;padding:10px 26px 8px 22px;border-radius:12px;rotate:-4deg;box-shadow:0 5px 0 var(--pom-deep);direction:ltr}
+.tag::before{content:"";width:12px;height:12px;border-radius:50%;background:#fff;margin-inline-end:6px;box-shadow:inset 0 1px 2px #0004}
+.tag .s{color:var(--saffron)}
+.tag.ok{background:var(--ok);box-shadow:0 5px 0 #0E7A49}
+.hint{color:var(--ink-soft);font-size:1.1rem;max-width:34ch;line-height:1.6;margin:0}
+.err .big-name{color:var(--pom)}
+.pop .big-emoji,.pop .mid-emoji{animation:pop .5s cubic-bezier(.25,1.7,.45,1)}
+.pop .tag{animation:swing 1s ease-out}
+@keyframes pop{0%{transform:scale(.3) rotate(-15deg);opacity:0}100%{transform:none;opacity:1}}
+@keyframes swing{0%{rotate:12deg}40%{rotate:-9deg}70%{rotate:-2deg}100%{rotate:-4deg}}
+.shake{animation:shake .45s}
+@keyframes shake{20%{transform:translateX(-12px)}45%{transform:translateX(10px)}70%{transform:translateX(-6px)}}
+.pill{border:0;background:var(--mode);color:#fff;font-weight:700;font-size:1.05rem;border-radius:999px;padding:10px 20px;box-shadow:0 4px 0 var(--mode-deep)}
+.pill.light{background:var(--ground);color:var(--ink);box-shadow:0 4px 0 var(--line)}
+.pill:active{transform:translateY(3px);box-shadow:0 1px 0 var(--mode-deep)}
+.choice{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+
+/* clinic */
+.bubble{position:relative;background:var(--mode-soft);border-radius:20px;padding:10px 20px;font-family:var(--display);font-weight:800;font-size:clamp(1.3rem,3vw,2rem);display:flex;align-items:center;gap:10px}
+.bubble::before{content:"";position:absolute;top:-12px;left:50%;translate:-50% 0;border:12px solid transparent;border-top:0;border-bottom-color:var(--mode-soft)}
+.slots{display:flex;gap:16px;margin-top:10px}
+.slot{width:clamp(84px,12vw,120px);aspect-ratio:1;border-radius:24px;border:4px dashed var(--line);display:grid;place-items:center;font-size:clamp(2.4rem,6vw,3.6rem);background:var(--paper)}
+.slot.filled{border:4px solid var(--mode);background:var(--mode-soft);animation:pop .45s cubic-bezier(.25,1.7,.45,1)}
+.slot.ghost{opacity:.35;filter:grayscale(.4)}
+
+/* treasure */
+.riddle{background:var(--saffron-soft);border-radius:22px;padding:16px 22px;max-width:30ch;font-family:var(--display);font-weight:800;font-size:clamp(1.3rem,3.2vw,2.1rem);line-height:1.35;rotate:-1deg;box-shadow:0 5px 0 #E8C25C}
+.dots{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.dots i{width:16px;height:16px;border-radius:50%;background:var(--line)}
+.dots i.done{background:var(--sky)} .dots i.now{background:var(--saffron);box-shadow:0 0 0 4px #FFB62744}
+
+/* ---------- side sheet ---------- */
+.side{position:relative;background:var(--paper);border-radius:22px 22px 0 0;display:flex;flex-direction:column;min-height:0;padding:16px 18px 28px;rotate:.6deg;
+  -webkit-mask:linear-gradient(#000 0 0) top/100% calc(100% - 12px) no-repeat,radial-gradient(circle 9px at 50% 100%,#0000 97%,#000) bottom/18px 12px repeat-x;
+  mask:linear-gradient(#000 0 0) top/100% calc(100% - 12px) no-repeat,radial-gradient(circle 9px at 50% 100%,#0000 97%,#000) bottom/18px 12px repeat-x}
+.rhead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.rhead h2{font-family:var(--display);font-size:1.4rem;margin:0}
+.rno{font-size:.8rem;color:var(--ink-soft);font-variant-numeric:tabular-nums;direction:ltr}
+.rsub{color:var(--ink-soft);font-size:.88rem;margin:2px 0 8px;min-height:1.2em}
+.mission{background:var(--saffron-soft);border-radius:14px;padding:8px 10px;margin-bottom:8px;display:grid;gap:6px}
+.mission .mt{font-weight:700;font-size:.95rem;display:flex;justify-content:space-between;gap:8px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip-i{background:var(--paper);border-radius:999px;padding:3px 10px;font-size:.95rem}
+.chip-i.got{background:var(--ok);color:#fff;text-decoration:line-through}
+.items{list-style:none;margin:0;padding:0;overflow-y:auto;flex:1;min-height:0;border-top:2px dashed var(--line)}
+.items li{display:grid;grid-template-columns:2.4rem minmax(0,1fr) auto;align-items:center;gap:10px;padding:8px 6px;border-bottom:1px dashed var(--line);font-size:1.08rem}
+.items li .e{font-size:1.6rem;text-align:center}
+.items li .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.items li .p{font-variant-numeric:tabular-nums;font-weight:700;direction:ltr}
+.items li .p.star::after{content:" ★";color:var(--saffron)}
+.items li.new{background:#FFE29A66;border-radius:10px;animation:slidein .35s ease-out}
+@keyframes slidein{from{transform:translateY(-8px);opacity:0}}
+.empty{display:grid!important;grid-template-columns:1fr!important;place-items:center;gap:6px;color:var(--ink-soft);padding:24px 6px!important;text-align:center;line-height:1.6;border:0!important}
+.empty .ee{font-size:2.2rem;opacity:.6}
+.sum{display:flex;justify-content:space-between;align-items:baseline;border-top:3px solid var(--ink);margin-top:10px;padding-top:10px;font-weight:700;font-size:1.25rem;font-variant-numeric:tabular-nums}
+.side .pill{margin-top:10px;align-self:center}
+
+/* ---------- bank cards ---------- */
+.bank{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.card{position:relative;overflow:hidden;border-radius:20px;color:#fff;padding:10px 18px;display:flex;align-items:center;gap:14px;min-height:78px;box-shadow:0 6px 0 #2A1B4A33}
+.card.f{background:linear-gradient(120deg,var(--fatima-a),var(--fatima-b))}
+.card.s{background:linear-gradient(120deg,var(--sama-a),var(--sama-b))}
+.card::before{content:"★";position:absolute;font-size:150px;line-height:1;inset-inline-end:-18px;top:-38px;color:#ffffff22;rotate:14deg}
+.card::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,#ffffff40 50%,transparent 60%);translate:-120% 0}
+.card.flash::after{animation:shine 1s ease-out}
+.card.flash{animation:hop .7s}
+@keyframes shine{to{translate:120% 0}}
+@keyframes hop{30%{transform:translateY(-8px)}}
+.chipm{width:40px;height:30px;border-radius:7px;flex:none;background:linear-gradient(135deg,#FFE7A3,#E0A92E);box-shadow:inset 0 0 0 2px #C99220}
+.ctext{min-width:0;position:relative}
+.who{font-family:var(--display);font-weight:800;font-size:1.55rem;line-height:1.05}
+.last{font-size:.82rem;opacity:.92;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bal{position:relative;margin-inline-start:auto;text-align:end;direction:ltr;font-family:var(--display-lat);font-weight:800;font-size:clamp(1.7rem,3.6vw,2.5rem);line-height:1;font-variant-numeric:tabular-nums}
+.bal .st{color:var(--saffron-soft);font-size:.7em}
+
+/* ---------- overlays ---------- */
+.overlay{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:#2A1B4Ad9;
+  padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.sheet{background:var(--paper);color:var(--ink);border-radius:28px;padding:26px;width:min(580px,100%);max-height:100%;overflow-y:auto;text-align:center;box-shadow:0 10px 0 #170D2B66}
+.sheet h3{font-family:var(--display);font-size:2.05rem;line-height:1.15;margin:4px 0 6px;text-wrap:balance}
+.sheet p{line-height:1.7;margin:6px 0}
+.welcome .big-emoji{font-size:5.5rem}
+.welcome .langs{justify-content:center;width:max-content;margin:14px auto 0}
+.cta{border:0;background:var(--pom);color:#fff;font-family:var(--display);font-weight:800;font-size:1.5rem;line-height:1.2;padding:12px 36px 10px;border-radius:999px;margin-top:16px;box-shadow:0 6px 0 var(--pom-deep)}
+.cta:active{transform:translateY(4px);box-shadow:0 2px 0 var(--pom-deep)}
+.small{font-size:.86rem;color:var(--ink-soft)}
+.ticket .paid{font-family:var(--display);font-weight:800;font-size:2.7rem;color:var(--ok);line-height:1.1}
+.rlines{text-align:start;margin:14px 0;border-block:2px dashed var(--line);padding:8px 0;font-variant-numeric:tabular-nums}
+.rlines div{display:flex;justify-content:space-between;gap:10px;padding:3px 0}
+.rlines .strong{font-weight:700;font-size:1.15rem}
+.change{display:inline-block;background:var(--saffron-soft);border-radius:14px;padding:8px 16px;font-size:1.15rem}
+.closed{background:linear-gradient(#2A1B4A,#3B2A6B);color:#fff}
+.closed .sheet{background:transparent;color:#fff;box-shadow:none}
+.moon{font-size:6rem;animation:float 4s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px)}}
+.closed .gearlink{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));inset-inline-end:max(16px,env(safe-area-inset-right,0px));background:#ffffff22;color:#fff}
+
+/* parent panel */
+.panel{text-align:start}
+.panel h3{text-align:center}
+.panel section{border-top:1px solid var(--line);padding:14px 0;display:grid;gap:10px}
+.panel h4{margin:0;font-size:1.02rem}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.row label{min-width:4.5rem}
+.row input,.row select{font:inherit;padding:8px 12px;border:2px solid var(--line);border-radius:12px;width:7rem;font-variant-numeric:tabular-nums;color:var(--ink);background:var(--paper)}
+.row input.wide{flex:1;min-width:0;width:auto}
+.row select{width:auto}
+.ghost{border:2px solid var(--line);background:var(--paper);padding:8px 14px;border-radius:12px;font-size:.98rem}
+.danger{border-color:var(--pom);color:var(--pom)}
+.codes{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:.92rem}
+.codes b{font-variant-numeric:tabular-nums;direction:ltr;text-align:start;white-space:nowrap}
+.toast{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));inset-inline:0;margin-inline:auto;width:max-content;max-width:90%;background:var(--ink);color:#fff;padding:10px 18px;border-radius:14px;z-index:30}
+canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:25;width:100%;height:100%}
+
+@media (max-width:980px){ .modes button .ml{display:none} .modes button{padding:0 12px} }
+@media (max-width:820px){
+  body{overflow:auto}
+  .app{height:auto;min-height:100%}
+  .main{grid-template-columns:1fr}
+  .stage{min-height:380px}
+  .side{min-height:300px;rotate:0deg}
+  .bank{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  .burst,.pop .big-emoji,.pop .mid-emoji,.pop .tag,.shake,.card.flash,.card.flash::after,.items li.new,.slot.filled,.moon{animation:none}
+}
+</style>
+</head>
+<body>
+
+
+<div class="app" id="app">
+  <header class="top">
+    <div class="sign"><span class="logo" aria-hidden="true">🧺</span><h1 class="brand" id="brand"></h1></div>
+    <nav class="modes" id="modes" aria-label="Mode"></nav>
+    <div class="tools">
+      <div class="langs" role="group" aria-label="Language" id="langsTop"></div>
+      <button class="iconbtn" id="fsBtn" type="button">⛶</button>
+      <button class="iconbtn" id="gearBtn" type="button">⚙︎</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="stagecol">
+      <div class="lcd" aria-live="polite">
+        <div><div class="label" id="lcdLabel"></div><div class="cash" id="lcdSub"></div></div>
+        <div class="amount"><span class="total" id="lcdValue">0</span><span class="unit" id="lcdUnit" aria-hidden="true">★</span></div>
+      </div>
+      <div class="stage">
+        <div class="awning" aria-hidden="true"></div>
+        <div class="burst" aria-hidden="true"></div>
+        <div class="stage-inner" id="stage"></div>
+      </div>
+    </div>
+    <aside class="side" id="side"></aside>
+  </main>
+
+  <footer class="bank" id="bank"></footer>
+</div>
+
+<div class="overlay" id="startOv">
+  <div class="sheet welcome">
+    <div class="big-emoji" aria-hidden="true">🛒</div>
+    <h3 id="startTitle"></h3>
+    <p id="startText"></p>
+    <div class="langs" role="group" aria-label="Language" id="langsStart"></div>
+    <div><button class="cta" id="startBtn" type="button"></button></div>
+    <p class="small" id="startNote"></p>
+  </div>
+</div>
+
+<div class="overlay" id="recOv" hidden><div class="sheet ticket" id="recSheet"></div></div>
+
+<div class="overlay closed" id="closedOv" hidden>
+  <div class="sheet">
+    <div class="moon" aria-hidden="true">🌙</div>
+    <h3 id="closedTitle"></h3>
+    <p id="closedText"></p>
+  </div>
+  <button class="iconbtn gearlink" id="closedGear" type="button">⚙︎</button>
+</div>
+
+<div class="overlay" id="panelOv" hidden>
+  <div class="sheet panel">
+    <h3 id="pTitle"></h3>
+    <section>
+      <h4 id="pTest"></h4>
+      <div class="row">
+        <input class="wide" id="manualCode" inputmode="numeric" placeholder="1001">
+        <button class="ghost" id="manualBtn" type="button"></button>
+      </div>
+      <div class="row" id="quickCodes"></div>
+    </section>
+    <section>
+      <h4 id="pBal"></h4>
+      <div class="row"><label for="bal9001" id="lbl9001"></label><input id="bal9001" type="number" min="0" step="1"></div>
+      <div class="row"><label for="bal9002" id="lbl9002"></label><input id="bal9002" type="number" min="0" step="1"></div>
+      <div class="row"><button class="ghost" id="saveBal" type="button"></button></div>
+    </section>
+    <section>
+      <h4 id="pTime"></h4>
+      <div class="row"><select id="limitSel"></select><button class="ghost" id="reopenBtn" type="button"></button></div>
+      <div class="small" id="timeInfo"></div>
+    </section>
+    <section>
+      <h4 id="pSound"></h4>
+      <div class="row"><button class="ghost" id="voiceBtn" type="button"></button><button class="ghost" id="sfxBtn" type="button"></button></div>
+      <div class="small" id="voiceInfo"></div>
+    </section>
+    <section>
+      <h4 id="pCodes"></h4>
+      <div class="codes" id="ctrlList"></div>
+    </section>
+    <section>
+      <h4 id="pHist"></h4>
+      <div class="small" id="histList"></div>
+      <div class="row" id="resetRow"></div>
+    </section>
+    <div class="row" style="justify-content:center"><button class="cta" id="closePanel" type="button" style="font-size:1.25rem"></button></div>
+  </div>
+</div>
+
+<canvas id="fx"></canvas>
+
+<script>
+/* ================= Catalogue (codes match the print kit) ================= */
+// [emoji, price, ar, en, de]
+const PRODUCTS = {
+  "1001":["🍎",2,"تفاح","Apples","Äpfel"], "1002":["🍌",2,"موز","Bananas","Bananen"], "1003":["🍓",4,"فراولة","Strawberries","Erdbeeren"],
+  "1004":["🍉",6,"بطيخ","Watermelon","Wassermelone"], "1005":["🥕",1,"جزر","Carrots","Karotten"], "1006":["🥛",3,"حليب","Milk","Milch"],
+  "1007":["🧃",2,"عصير","Juice","Saft"], "1008":["🍞",1,"خبز","Bread","Brot"], "1009":["🧀",5,"جبنة","Cheese","Käse"],
+  "1010":["🥚",4,"بيض","Eggs","Eier"], "1011":["🍫",3,"شوكولاتة","Chocolate","Schokolade"], "1012":["🍪",2,"بسكويت","Cookies","Kekse"],
+  "1013":["🍦",4,"آيس كريم","Ice cream","Eis"], "1014":["🍕",9,"بيتزا","Pizza","Pizza"], "1015":["🧸",15,"دبدوب","Teddy bear","Teddybär"],
+  "1016":["📚",8,"كتاب قصص","Storybook","Märchenbuch"], "1017":["🖍️",6,"ألوان","Crayons","Buntstifte"], "1018":["🎈",1,"بالونة","Balloon","Luftballon"],
+  "1019":["🍯",7,"عسل","Honey","Honig"], "1020":["🫒",5,"زيتون","Olives","Oliven"]
+};
+// [emoji, ar, en, de]
+const PATIENTS = {
+  "3001":["🧸","دبدوب","Teddy","Teddy"], "3002":["🐰","أرنوبة","Bunny","Häschen"], "3003":["🐱","قطقوطة","Kitty","Kätzchen"],
+  "3004":["🦖","ديناصور","Dino","Dino"], "3005":["🦄","يونيكورن","Unicorn","Einhorn"], "3006":["🐼","باندا","Panda","Panda"]
+};
+const MEDS = {
+  "4001":["🩹","لاصقة","Plaster","Pflaster"], "4002":["🌡️","ميزان الحرارة","Thermometer","Thermometer"], "4003":["🍯","شراب العسل","Honey syrup","Honigsaft"],
+  "4004":["💧","كوب ماء","Glass of water","Glas Wasser"], "4005":["🧣","وشاح دافئ","Warm scarf","Warmer Schal"], "4006":["📖","قصة قبل النوم","Bedtime story","Gutenachtgeschichte"],
+  "4007":["🍊","فيتامين","Vitamins","Vitamine"], "4008":["🤗","عناق","Big hug","Umarmung"]
+};
+const AILMENTS = [
+  {e:"🥵", need:["4002","4004"], ar:"حرارة مرتفعة", en:"Fever", de:"Fieber"},
+  {e:"🤕", need:["4001","4008"], ar:"خدش في الركبة", en:"Scraped knee", de:"Aufgeschürftes Knie"},
+  {e:"😷", need:["4003","4005"], ar:"كحة", en:"Cough", de:"Husten"},
+  {e:"🥱", need:["4006","4008"], ar:"لا يستطيع النوم", en:"Can't fall asleep", de:"Kann nicht einschlafen"},
+  {e:"😩", need:["4007","4004"], ar:"تعب شديد", en:"Very tired", de:"Sehr müde"},
+  {e:"🤧", need:["4005","4007"], ar:"زكام", en:"A cold", de:"Erkältung"},
+  {e:"😢", need:["4008","4003"], ar:"حزن", en:"Feeling sad", de:"Traurig"}
+];
+// [emoji, ar place, en, de, riddle ar, riddle en, riddle de]
+const SPOTS = {
+  "5001":["🧊","الثلاجة","Fridge","Kühlschrank","مكان بارد جداً، فيه الحليب والعصير ينتظران.","A very cold place where milk and juice wait.","Ein sehr kalter Ort, an dem Milch und Saft warten."],
+  "5002":["📚","رف الكتب","Bookshelf","Bücherregal","هنا تسكن الحكايات، صفاً فوق صف.","Stories live here, row above row.","Hier wohnen Geschichten, Reihe über Reihe."],
+  "5003":["🛏️","الوسادة","Pillow","Kopfkissen","أضع رأسي عليها كل ليلة وأحلم.","I rest my head on it every night and dream.","Darauf lege ich jede Nacht meinen Kopf und träume."],
+  "5004":["👟","رف الأحذية","Shoe rack","Schuhregal","تنتظرني هنا الأحذية قبل كل خروج.","Shoes wait here before every trip outside.","Hier warten die Schuhe vor jedem Ausflug."],
+  "5005":["🪴","النبتة","Plant","Pflanze","أنا خضراء وأشرب الماء، لكنني لا أمشي أبداً.","I'm green and I drink water, but I never walk.","Ich bin grün und trinke Wasser, aber ich laufe nie."],
+  "5006":["🛋️","الكنبة","Sofa","Sofa","نجلس عليها جميعاً لنشاهد التلفاز.","We all sit on it to watch TV.","Darauf sitzen wir alle zum Fernsehen."],
+  "5007":["🪟","النافذة","Window","Fenster","منها نرى المطر والشمس والسماء.","Through it you see rain, sun and sky.","Durch mich siehst du Regen, Sonne und Himmel."],
+  "5008":["🧸","صندوق الألعاب","Toy box","Spielzeugkiste","صندوق مليء بالأصدقاء الصغار.","A box full of little friends.","Eine Kiste voller kleiner Freunde."],
+  "5009":["🫧","الغسالة","Washing machine","Waschmaschine","أدور وأدور حتى تصبح الملابس نظيفة.","I spin and spin until the clothes are clean.","Ich drehe mich, bis die Kleidung sauber ist."],
+  "5010":["🍽️","طاولة الطعام","Dining table","Esstisch","حولها تجتمع العائلة لتأكل.","The family gathers around it to eat.","Hier sitzt die Familie zum Essen zusammen."]
+};
+const LANG_IDX = {ar:0,en:1,de:2};
+const BILLS = {"7001":1,"7002":2,"7005":5,"7010":10,"7020":20};
+const KIDS = {"9001":{cls:"f",name:{ar:"فاطمة",en:"Fatima",de:"Fatima"}}, "9002":{cls:"s",name:{ar:"سماء",en:"Sama",de:"Sama"}}};
+const CTRL = {"8001":"undo","8002":"clear","8010":"bonus","8020":"balance","8030":"mission","8101":"m:shop","8102":"m:clinic","8103":"m:treasure"};
+const START_BALANCE = 50, BONUS = 10, MISSION_BONUS = 3;
+const KEY = "dukkan_fs_v3";
+
+/* ================= Languages ================= */
+const L = {
+ ar:{
+  dir:"rtl", label:"ع", voice:/^ar/i,
+  brand:"دكان فاطمة وسماء", modes:{shop:"الدكان",clinic:"العيادة",treasure:"الكنز"},
+  stars:n=> n===1?"نجمة واحدة": n===2?"نجمتان": (n>=3&&n<=10)? n+" نجوم" : n+" نجمة",
+  items:n=> n===1?"منتج واحد": n===2?"منتجان": (n>=3&&n<=10)? n+" منتجات": n+" منتجاً",
+  total:"المجموع", receipt:"الفاتورة", sum:"الإجمالي",
+  cashLine:(c,r)=>"نقداً "+c+" ★ · باقي "+r+" ★",
+  emptyBill:"الفاتورة فارغة", emptyBillHint:"كل منتج تمسحينه يظهر هنا",
+  idle:"امسحي أول منتج لتبدأ الفاتورة",
+  startTitle:"الدكان مفتوح!", startText:"دكان وعيادة وخريطة كنز. امسحي البطاقات بالماسح وابدئي اللعب.", startBtn:"افتحي الدكان",
+  startNote:"لا يوجد ماسح؟ اكتب الكود يدوياً من لوحة الأهل ⚙︎",
+  paidCard:"تم الدفع!", paidCash:"تم الدفع نقداً!", cardOf:n=>"بطاقة "+n, before:"الرصيد قبل", after:"الرصيد الآن",
+  received:"المستلم", change:"الباقي", giveChange:x=>"أعطي الزبونة الباقي: "+x, exact:"المبلغ مضبوط تماماً 👌", newBill:"فاتورة جديدة",
+  recv:v=>"استلمت "+v+" ★", left:r=>"باقي "+r+" ★ للدفع",
+  unknown:c=>"كود غير معروف: "+c, payFirst:"أكملي الدفع أولاً", cashStarted:"بدأ الدفع نقداً — أكملي بالنقود",
+  notEnough:(n,m)=>"رصيد "+n+" لا يكفي — ينقص "+m+" ★",
+  bonusFor:n=>"مكافأة لـ"+n, balanceOf:n=>"رصيد "+n, removed:n=>"حذفنا "+n, nothingToUndo:"لا يوجد ما يُحذف", noUndoPaying:"لا يمكن الحذف أثناء الدفع",
+  bonusTitle:"مكافأة!", balanceTitle:"كشف حساب", scanCard:"امسحي بطاقة البنك الآن",
+  pendBonus:"⭐ امسحي بطاقة من تستحق المكافأة", pendBalance:"🔍 امسحي البطاقة لعرض الرصيد",
+  noTx:"لا توجد عمليات بعد", txBonus:"مكافأة", txCash:"نقداً", txMission:"قائمة التسوق",
+  missionTitle:"قائمة التسوق", missionNew:"قائمة جديدة", missionHint:"اشتري هذه الأشياء الثلاثة ثم ادفعي ببطاقتك",
+  missionDone:"اكتملت القائمة! ادفعي ببطاقتك لتربحي "+MISSION_BONUS+" ★", missionBonus:"مكافأة المتسوّقة الذكية", missionStart:"🎯 قائمة تسوق",
+  clinic:{side:"سجل المرضى", healedToday:"شُفي اليوم", idle:"امسحي سوار المريض لتبدئي الفحص", diag:"التشخيص",
+    needs:"ماذا يحتاج المريض؟ امسحي العلاج الصحيح", needPatient:"امسحي سوار المريض أولاً", wrong:(m,a)=>m+" لا يفيد في: "+a, already:"هذا موجود بالفعل",
+    healed:n=>n+" شُفي!", hint:"💡 تلميح", sticker:n=>"🩷 × "+n, none:"لا مرضى بعد"},
+  treasure:{side:"خريطة الكنز", clue:"اللغز", setup:"كم لغزاً في هذه المغامرة؟", start:"ابدئي المغامرة", parents:"👀 للأهل فقط",
+    hideAt:p=>"خبّئ الكنز عند: "+p, found:p=>"وجدتِها! "+p, notHere:"ليس هنا! اقرئي اللغز مرة أخرى", treasure:"الكنز!", treasureText:"وجدتِ الكنز! اذهبي وافتحيه",
+    again:"مغامرة جديدة", hint:"💡 تلميح", left:n=>"بقي "+n, idleSide:"امسحي الأكواد المخبأة في البيت بالترتيب"},
+  ctrl:{undo:"↩️ حذف آخر منتج", clear:"🧹 فاتورة جديدة / إعادة", bonus:"⭐ مكافأة +10 ثم امسح البطاقة", balance:"🔍 كشف حساب ثم امسح البطاقة",
+        mission:"🎯 قائمة تسوق جديدة", "m:shop":"🛒 وضع الدكان", "m:clinic":"🏥 وضع العيادة", "m:treasure":"🗺️ وضع الكنز"},
+  pTitle:"لوحة الأهل", pTest:"تجربة بدون ماسح", scan:"امسح", pBal:"الأرصدة", saveBal:"حفظ الأرصدة", saved:"تم حفظ الأرصدة", badNum:"اكتب رقماً صحيحاً من 0 فما فوق",
+  pTime:"وقت الإغلاق", limitOff:"بدون وقت محدد", limitMin:n=>"يغلق الدكان بعد "+n+" دقيقة", reopen:"افتح الدكان من جديد",
+  timeLeft:n=>"باقي "+n+" دقيقة على الإغلاق", timeOff:"لا يوجد وقت إغلاق", reopened:"فُتح الدكان من جديد",
+  closedTitle:"الدكان مغلق الآن", closedText:"أحسنتما اليوم! نراكما غداً 🌟",
+  pSound:"الصوت", voiceOn:"🔊 النطق يعمل", voiceOff:"🔇 النطق متوقف", sfxOn:"🎵 المؤثرات تعمل", sfxOff:"🎵 المؤثرات متوقفة",
+  voiceUsing:n=>"الصوت المستخدم: "+n, noVoice:"لا يوجد صوت عربي على هذا الجهاز. ثبّته من إعدادات تحويل النص إلى كلام.", noTTS:"هذا المتصفح لا يدعم النطق.",
+  pCodes:"دليل الأكواد", rows:{cards:"بطاقة فاطمة / بطاقة سماء", bills:"النقود (1، 2، 5، 10، 20 نجمة)", prod:"المنتجات", pat:"أساور المرضى", med:"العلاجات", spot:"أماكن الكنز"},
+  pHist:"آخر العمليات", reset:"بدء يوم جديد (تصفير الأرصدة والسجل)", resetAsk:"متأكد؟ تعود الأرصدة إلى "+START_BALANCE+" ويُمسح السجل.", resetYes:"نعم، ابدأ يوماً جديداً", cancel:"إلغاء", resetDone:"بدأ يوم جديد",
+  back:"رجوع للدكان", fs:"ملء الشاشة", fsNo:"ملء الشاشة غير متاح هنا. أضف الصفحة إلى الشاشة الرئيسية.", gear:"لوحة الأهل",
+  say:{
+   product:(n,p)=>n+"، "+L.ar.stars(p), recv:(v,r)=>"استلمت "+L.ar.stars(v)+"، باقي "+L.ar.stars(r),
+   cashDone:c=> c>0 ? "شكراً لك. الباقي "+L.ar.stars(c) : "شكراً لك. المبلغ مضبوط",
+   paid:(n,b)=>"تم الدفع. شكراً يا "+n+". رصيدك الآن "+L.ar.stars(b),
+   notEnough:(n,m)=>"رصيد "+n+" لا يكفي. ينقصك "+L.ar.stars(m),
+   bonus:n=>"أحسنتِ يا "+n+"! أضفنا عشر نجوم إلى حسابك", balance:(n,b)=>"رصيد "+n+" "+L.ar.stars(b),
+   removed:n=>"حذفنا "+n, newBill:"فاتورة جديدة", unknown:"هذا الكود غير معروف", empty:"الفاتورة فارغة، امسحي المنتجات أولاً",
+   payFirst:"أكملي الدفع أولاً", cashStarted:"بدأنا الدفع نقداً، أكملي بالنقود",
+   pendBonus:"امسحي بطاقة من تستحق المكافأة", pendBalance:"امسحي البطاقة", welcome:"أهلاً بكِ في دكان فاطمة وسماء",
+   mission:l=>"قائمة التسوق: "+l, missionDone:"رائع! اكتملت القائمة",
+   mode:{shop:"الدكان مفتوح", clinic:"العيادة مفتوحة، أهلاً دكتورة", treasure:"مغامرة الكنز"},
+   patient:(n,a)=>n+". التشخيص: "+a+". ماذا يحتاج؟", correct:m=>m+"، صحيح!", wrong:"لا، جرّبي علاجاً آخر", healed:n=>"رائع! "+n+" شُفي تماماً",
+   needPatient:"امسحي سوار المريض أولاً",
+   clue:r=>r, found:"وجدتِها!", notHere:"ليس هنا", treasure:"وجدتِ الكنز! مبروك", closed:"الدكان مغلق الآن. نراكما غداً"
+  }
+ },
+ en:{
+  dir:"ltr", label:"EN", voice:/^en/i,
+  brand:"Fatima & Sama's Shop", modes:{shop:"Shop",clinic:"Clinic",treasure:"Treasure"},
+  stars:n=> n===1?"1 star": n+" stars", items:n=> n===1?"1 item": n+" items",
+  total:"Total", receipt:"Receipt", sum:"Total",
+  cashLine:(c,r)=>"Cash "+c+" ★ · "+r+" ★ to go",
+  emptyBill:"The receipt is empty", emptyBillHint:"Every item you scan shows up here",
+  idle:"Scan the first item to start a receipt",
+  startTitle:"The shop is open!", startText:"A shop, a clinic and a treasure map. Scan the cards and start playing.", startBtn:"Open the shop",
+  startNote:"No scanner yet? Type a code in the parents' panel ⚙︎",
+  paidCard:"Paid!", paidCash:"Paid in cash!", cardOf:n=>n+"'s card", before:"Balance before", after:"Balance now",
+  received:"Received", change:"Change", giveChange:x=>"Give back the change: "+x, exact:"Exact amount 👌", newBill:"New receipt",
+  recv:v=>"Got "+v+" ★", left:r=>r+" ★ still to pay",
+  unknown:c=>"Unknown code: "+c, payFirst:"Finish paying first", cashStarted:"Cash payment started, keep paying with money",
+  notEnough:(n,m)=>n+" needs "+m+" ★ more",
+  bonusFor:n=>"Bonus for "+n, balanceOf:n=>n+"'s balance", removed:n=>"Removed "+n, nothingToUndo:"Nothing to remove", noUndoPaying:"Can't remove items while paying",
+  bonusTitle:"Bonus!", balanceTitle:"Balance check", scanCard:"Scan a bank card now",
+  pendBonus:"⭐ Scan the card of who earned the bonus", pendBalance:"🔍 Scan a card to see its balance",
+  noTx:"No payments yet", txBonus:"Bonus", txCash:"Cash", txMission:"Shopping list",
+  missionTitle:"Shopping list", missionNew:"New list", missionHint:"Buy these three things, then pay with your card",
+  missionDone:"List complete! Pay with your card to win "+MISSION_BONUS+" ★", missionBonus:"Smart shopper bonus", missionStart:"🎯 Shopping list",
+  clinic:{side:"Patient chart", healedToday:"Healed today", idle:"Scan a patient's wristband to start the check-up", diag:"Diagnosis",
+    needs:"What does the patient need? Scan the right treatment", needPatient:"Scan a patient's wristband first", wrong:(m,a)=>m+" won't help with: "+a, already:"Already given",
+    healed:n=>n+" is all better!", hint:"💡 Hint", sticker:n=>"🩷 × "+n, none:"No patients yet"},
+  treasure:{side:"Treasure map", clue:"Clue", setup:"How many clues for this adventure?", start:"Start the adventure", parents:"👀 Parents only",
+    hideAt:p=>"Hide the treasure at: "+p, found:p=>"Found it! "+p, notHere:"Not here! Read the clue again", treasure:"Treasure!", treasureText:"You found the treasure! Go and open it",
+    again:"New adventure", hint:"💡 Hint", left:n=>n+" left", idleSide:"Scan the codes hidden around the house, in order"},
+  ctrl:{undo:"↩️ Remove last item", clear:"🧹 New receipt / restart", bonus:"⭐ Bonus +10, then scan a card", balance:"🔍 Balance check, then scan a card",
+        mission:"🎯 New shopping list", "m:shop":"🛒 Shop mode", "m:clinic":"🏥 Clinic mode", "m:treasure":"🗺️ Treasure mode"},
+  pTitle:"Parents' panel", pTest:"Try without a scanner", scan:"Scan", pBal:"Balances", saveBal:"Save balances", saved:"Balances saved", badNum:"Enter a whole number, 0 or more",
+  pTime:"Closing time", limitOff:"No time limit", limitMin:n=>"Close the shop after "+n+" minutes", reopen:"Reopen the shop",
+  timeLeft:n=>n+" minutes until closing", timeOff:"No closing time set", reopened:"Shop reopened",
+  closedTitle:"The shop is closed", closedText:"Great playing today! See you tomorrow 🌟",
+  pSound:"Sound", voiceOn:"🔊 Voice on", voiceOff:"🔇 Voice off", sfxOn:"🎵 Sound effects on", sfxOff:"🎵 Sound effects off",
+  voiceUsing:n=>"Voice in use: "+n, noVoice:"No English voice on this device. Install one in the text-to-speech settings.", noTTS:"This browser can't speak.",
+  pCodes:"Code guide", rows:{cards:"Fatima's card / Sama's card", bills:"Money (1, 2, 5, 10, 20 stars)", prod:"Products", pat:"Patient wristbands", med:"Treatments", spot:"Treasure spots"},
+  pHist:"Recent activity", reset:"Start a new day (reset balances and history)", resetAsk:"Sure? Balances go back to "+START_BALANCE+" and history is cleared.", resetYes:"Yes, start a new day", cancel:"Cancel", resetDone:"New day started",
+  back:"Back to the shop", fs:"Full screen", fsNo:"Full screen isn't available here. Add the page to your home screen.", gear:"Parents' panel",
+  say:{
+   product:(n,p)=>n+", "+L.en.stars(p), recv:(v,r)=>"Got "+L.en.stars(v)+". "+L.en.stars(r)+" to go",
+   cashDone:c=> c>0 ? "Thank you! Your change is "+L.en.stars(c) : "Thank you! That's exactly right",
+   paid:(n,b)=>"Paid. Thank you, "+n+"! You now have "+L.en.stars(b),
+   notEnough:(n,m)=>"Not enough stars, "+n+". You need "+L.en.stars(m)+" more",
+   bonus:n=>"Well done, "+n+"! Ten stars added to your account", balance:(n,b)=>n+" has "+L.en.stars(b),
+   removed:n=>"Removed "+n, newBill:"New receipt", unknown:"I don't know this code", empty:"The receipt is empty. Scan some items first",
+   payFirst:"Finish paying first", cashStarted:"You started paying with cash. Keep going with money",
+   pendBonus:"Scan the card of who earned the bonus", pendBalance:"Scan a card", welcome:"Welcome to Fatima and Sama's shop",
+   mission:l=>"Shopping list: "+l, missionDone:"Great! The list is complete",
+   mode:{shop:"The shop is open", clinic:"The clinic is open. Hello, doctor", treasure:"Treasure adventure"},
+   patient:(n,a)=>n+". Diagnosis: "+a+". What does it need?", correct:m=>m+". Correct!", wrong:"No, try another treatment", healed:n=>"Wonderful! "+n+" is all better",
+   needPatient:"Scan a patient's wristband first",
+   clue:r=>r, found:"You found it!", notHere:"Not here", treasure:"You found the treasure! Congratulations", closed:"The shop is closed now. See you tomorrow"
+  }
+ },
+ de:{
+  dir:"ltr", label:"DE", voice:/^de/i,
+  brand:"Fatimas & Samas Laden", modes:{shop:"Laden",clinic:"Praxis",treasure:"Schatz"},
+  stars:n=> n===1?"1 Stern": n+" Sterne", items:n=> n===1?"1 Artikel": n+" Artikel",
+  total:"Summe", receipt:"Kassenbon", sum:"Gesamt",
+  cashLine:(c,r)=>"Bar "+c+" ★ · noch "+r+" ★",
+  emptyBill:"Der Kassenbon ist leer", emptyBillHint:"Jeder gescannte Artikel erscheint hier",
+  idle:"Scanne den ersten Artikel für einen neuen Bon",
+  startTitle:"Der Laden hat geöffnet!", startText:"Ein Laden, eine Arztpraxis und eine Schatzkarte. Scanne die Karten und los geht's.", startBtn:"Laden öffnen",
+  startNote:"Noch kein Scanner? Gib einen Code im Elternbereich ⚙︎ ein",
+  paidCard:"Bezahlt!", paidCash:"Bar bezahlt!", cardOf:n=>"Karte von "+n, before:"Guthaben vorher", after:"Guthaben jetzt",
+  received:"Erhalten", change:"Rückgeld", giveChange:x=>"Gib das Rückgeld zurück: "+x, exact:"Genau passend 👌", newBill:"Neuer Bon",
+  recv:v=>v+" ★ erhalten", left:r=>"noch "+r+" ★ zu zahlen",
+  unknown:c=>"Unbekannter Code: "+c, payFirst:"Erst fertig bezahlen", cashStarted:"Barzahlung läuft, bitte mit Geld weiterzahlen",
+  notEnough:(n,m)=>n+" fehlen noch "+m+" ★",
+  bonusFor:n=>"Bonus für "+n, balanceOf:n=>"Guthaben von "+n, removed:n=>n+" entfernt", nothingToUndo:"Nichts zum Entfernen", noUndoPaying:"Beim Bezahlen nicht möglich",
+  bonusTitle:"Bonus!", balanceTitle:"Kontostand", scanCard:"Jetzt eine Bankkarte scannen",
+  pendBonus:"⭐ Karte von der Person scannen, die den Bonus verdient hat", pendBalance:"🔍 Karte scannen, um das Guthaben zu sehen",
+  noTx:"Noch keine Zahlungen", txBonus:"Bonus", txCash:"Bar", txMission:"Einkaufsliste",
+  missionTitle:"Einkaufsliste", missionNew:"Neue Liste", missionHint:"Kaufe diese drei Sachen und bezahle mit deiner Karte",
+  missionDone:"Liste komplett! Mit Karte bezahlen und "+MISSION_BONUS+" ★ gewinnen", missionBonus:"Bonus für schlaues Einkaufen", missionStart:"🎯 Einkaufsliste",
+  clinic:{side:"Patientenakte", healedToday:"Heute geheilt", idle:"Scanne das Armband eines Patienten für die Untersuchung", diag:"Diagnose",
+    needs:"Was braucht der Patient? Scanne die richtige Behandlung", needPatient:"Scanne zuerst das Armband eines Patienten", wrong:(m,a)=>m+" hilft nicht bei: "+a, already:"Schon gegeben",
+    healed:n=>n+" ist wieder gesund!", hint:"💡 Tipp", sticker:n=>"🩷 × "+n, none:"Noch keine Patienten"},
+  treasure:{side:"Schatzkarte", clue:"Rätsel", setup:"Wie viele Rätsel soll das Abenteuer haben?", start:"Abenteuer starten", parents:"👀 Nur für Eltern",
+    hideAt:p=>"Versteckt den Schatz hier: "+p, found:p=>"Gefunden! "+p, notHere:"Nicht hier! Lies das Rätsel noch einmal", treasure:"Der Schatz!", treasureText:"Du hast den Schatz gefunden! Mach ihn auf",
+    again:"Neues Abenteuer", hint:"💡 Tipp", left:n=>"noch "+n, idleSide:"Scanne die versteckten Codes im Haus der Reihe nach"},
+  ctrl:{undo:"↩️ Letzten Artikel entfernen", clear:"🧹 Neuer Bon / Neustart", bonus:"⭐ Bonus +10, dann Karte scannen", balance:"🔍 Kontostand, dann Karte scannen",
+        mission:"🎯 Neue Einkaufsliste", "m:shop":"🛒 Laden", "m:clinic":"🏥 Arztpraxis", "m:treasure":"🗺️ Schatzsuche"},
+  pTitle:"Elternbereich", pTest:"Ohne Scanner testen", scan:"Scannen", pBal:"Guthaben", saveBal:"Guthaben speichern", saved:"Guthaben gespeichert", badNum:"Bitte eine ganze Zahl ab 0 eingeben",
+  pTime:"Ladenschluss", limitOff:"Keine Zeitgrenze", limitMin:n=>"Laden schließt nach "+n+" Minuten", reopen:"Laden wieder öffnen",
+  timeLeft:n=>"Noch "+n+" Minuten bis Ladenschluss", timeOff:"Kein Ladenschluss eingestellt", reopened:"Laden wieder geöffnet",
+  closedTitle:"Der Laden ist geschlossen", closedText:"Toll gespielt heute! Bis morgen 🌟",
+  pSound:"Ton", voiceOn:"🔊 Sprache an", voiceOff:"🔇 Sprache aus", sfxOn:"🎵 Effekte an", sfxOff:"🎵 Effekte aus",
+  voiceUsing:n=>"Verwendete Stimme: "+n, noVoice:"Keine deutsche Stimme auf diesem Gerät. In den Sprachausgabe-Einstellungen installieren.", noTTS:"Dieser Browser kann nicht sprechen.",
+  pCodes:"Code-Übersicht", rows:{cards:"Fatimas Karte / Samas Karte", bills:"Geld (1, 2, 5, 10, 20 Sterne)", prod:"Artikel", pat:"Patientenarmbänder", med:"Behandlungen", spot:"Schatz-Verstecke"},
+  pHist:"Letzte Buchungen", reset:"Neuen Tag beginnen (Guthaben und Verlauf zurücksetzen)", resetAsk:"Sicher? Das Guthaben geht auf "+START_BALANCE+" zurück und der Verlauf wird gelöscht.", resetYes:"Ja, neuen Tag beginnen", cancel:"Abbrechen", resetDone:"Neuer Tag begonnen",
+  back:"Zurück zum Laden", fs:"Vollbild", fsNo:"Vollbild ist hier nicht verfügbar. Seite zum Startbildschirm hinzufügen.", gear:"Elternbereich",
+  say:{
+   product:(n,p)=>n+", "+L.de.stars(p), recv:(v,r)=>L.de.stars(v)+" erhalten. Noch "+L.de.stars(r),
+   cashDone:c=> c>0 ? "Danke schön! Dein Rückgeld: "+L.de.stars(c) : "Danke schön! Passt genau",
+   paid:(n,b)=>"Bezahlt. Danke, "+n+"! Du hast jetzt "+L.de.stars(b),
+   notEnough:(n,m)=>n+", das reicht nicht. Es fehlen noch "+L.de.stars(m),
+   bonus:n=>"Super gemacht, "+n+"! Zehn Sterne für dein Konto", balance:(n,b)=>n+" hat "+L.de.stars(b),
+   removed:n=>n+" entfernt", newBill:"Neuer Bon", unknown:"Diesen Code kenne ich nicht", empty:"Der Bon ist leer. Scanne zuerst Artikel",
+   payFirst:"Erst fertig bezahlen", cashStarted:"Du zahlst bar. Bitte mit Geld weiterzahlen",
+   pendBonus:"Scanne die Karte von der Person, die den Bonus verdient hat", pendBalance:"Scanne eine Karte", welcome:"Willkommen in Fatimas und Samas Laden",
+   mission:l=>"Einkaufsliste: "+l, missionDone:"Super! Die Liste ist komplett",
+   mode:{shop:"Der Laden ist offen", clinic:"Die Praxis ist offen. Hallo, Frau Doktor", treasure:"Schatzsuche"},
+   patient:(n,a)=>n+". Diagnose: "+a+". Was braucht es?", correct:m=>m+". Richtig!", wrong:"Nein, probier eine andere Behandlung", healed:n=>"Wunderbar! "+n+" ist wieder gesund",
+   needPatient:"Scanne zuerst das Armband eines Patienten",
+   clue:r=>r, found:"Gefunden!", notHere:"Nicht hier", treasure:"Du hast den Schatz gefunden! Glückwunsch", closed:"Der Laden ist jetzt geschlossen. Bis morgen"
+  }
+ }
+};
+
+/* ================= State ================= */
+function today(){ const d=new Date(); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
+function defaults(){ return {balances:{"9001":START_BALANCE,"9002":START_BALANCE}, history:[], voice:true, sfx:true, lang:"ar", receiptNo:1,
+  mode:"shop", healed:{}, healedDay:today(), limit:0, clues:5}; }
+let S = defaults();
+try{ const raw = localStorage.getItem(KEY); if(raw) S = Object.assign(defaults(), JSON.parse(raw)); }catch(e){}
+if(!L[S.lang]) S.lang = "ar";
+if(S.healedDay !== today()){ S.healed = {}; S.healedDay = today(); }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+
+let cart = [], cash = 0, pending = null, receiptTimer = null, lastView = null;
+let mission = null;                       // {items:[codes], got:[codes]}
+let clinic = null;                        // {patient, ail, got:[], wrong:0, hint:false}
+let hunt = null;                          // {route:[codes], idx, hint:false, parents:false, done:false}
+let sessionStart = null, closed = false;
+const $ = id => document.getElementById(id);
+const T = () => L[S.lang];
+const li = () => LANG_IDX[S.lang];
+const total = () => cart.reduce((a,c)=>a+PRODUCTS[c][1],0);
+const pname = (code, lang) => PRODUCTS[code][2 + LANG_IDX[lang||S.lang]];
+const patName = c => PATIENTS[c][1+li()];
+const medName = c => MEDS[c][1+li()];
+const spotName = c => SPOTS[c][1+li()];
+const riddle = c => SPOTS[c][4+li()];
+const ailName = a => a[S.lang];
+const kname = code => KIDS[code].name[S.lang];
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuffle = a => { a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+
+/* ================= Sound ================= */
+let AC = null;
+function audio(){ if(!AC){ try{ AC = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(AC && AC.state==="suspended") AC.resume(); return AC; }
+function tone(f, start, dur, type, vol){
+  const ac = audio(); if(!ac || !S.sfx) return;
+  const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + start;
+  o.type = type||"sine"; o.frequency.value = f;
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol||.15,t+.01); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g).connect(ac.destination); o.start(t); o.stop(t+dur+.03);
+}
+const SFX = {
+  beep(){ tone(1760,0,.09,"square",.07); },
+  coin(){ tone(1320,0,.08,"triangle",.2); tone(1980,.07,.2,"triangle",.17); },
+  error(){ tone(240,0,.16,"sawtooth",.1); tone(190,.17,.26,"sawtooth",.1); },
+  kaching(){ [988,1319,1568,2093].forEach((f,i)=>tone(f,i*.07,.35,"triangle",.15)); tone(2637,.32,.55,"sine",.11); },
+  soft(){ tone(660,0,.12,"sine",.13); tone(880,.1,.18,"sine",.11); },
+  heal(){ [523,659,784,1047,1319].forEach((f,i)=>tone(f,i*.09,.4,"sine",.14)); },
+  ding(){ tone(1175,0,.25,"sine",.16); tone(1568,.12,.35,"sine",.13); },
+  fanfare(){ [392,523,659,784,659,784,1047].forEach((f,i)=>tone(f,i*.12,.3,"triangle",.15)); tone(1568,.9,.9,"sine",.12); }
+};
+
+/* ================= Voice ================= */
+let voices = [];
+function loadVoices(){ if("speechSynthesis" in window){ voices = speechSynthesis.getVoices(); renderVoiceInfo(); } }
+if("speechSynthesis" in window){ loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+function voiceFor(lang){ const re = L[lang].voice; return voices.find(v=>re.test(v.lang) && /google|enhanced|premium|natural/i.test(v.name)) || voices.find(v=>re.test(v.lang)) || null; }
+function say(text){
+  if(!S.voice) return; const v = voiceFor(S.lang); if(!v) return;
+  try{ speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.voice=v; u.lang=v.lang; u.rate=.98; u.pitch=1.1; speechSynthesis.speak(u); }catch(e){}
+}
+
+/* ================= Stage views ================= */
+function view(fn, cls){ lastView = fn; drawView(cls===undefined ? "pop" : cls); }
+function drawView(cls){
+  const el = $("stage"); el.className = "stage-inner"; void el.offsetWidth;
+  if(cls) el.classList.add(...cls.split(" "));
+  el.innerHTML = lastView();
+}
+const V = {
+  idle: ()=>'<div class="big-emoji">🛒</div><p class="hint">'+T().idle+'</p><div class="choice"><button class="pill" type="button" data-act="mission">'+T().missionStart+'</button></div>',
+  product: code => ()=>{
+    const [e,p] = PRODUCTS[code];
+    const others = Object.keys(LANG_IDX).filter(l=>l!==S.lang).map(l=>'<span><b>'+L[l].label+'</b>'+esc(pname(code,l))+'</span>').join("");
+    return '<div class="big-emoji">'+e+'</div><p class="big-name">'+esc(pname(code))+'</p><div class="also">'+others+'</div><div class="tag">'+p+' <span class="s">★</span></div>';
+  },
+  msg: (emoji, title, hint, tag) => ()=>'<div class="big-emoji">'+emoji+'</div><p class="big-name">'+title()+'</p>'+(hint?'<p class="hint">'+hint()+'</p>':'')+(tag?'<div class="tag ok">'+tag()+' <span class="s">★</span></div>':''),
+  clinicIdle: ()=>'<div class="big-emoji">🏥</div><p class="hint">'+T().clinic.idle+'</p>',
+  clinicCase: ()=>{
+    const c = clinic, t = T().clinic, [pe] = PATIENTS[c.patient];
+    const slots = c.ail.need.map(m=>{
+      const got = c.got.includes(m);
+      return '<div class="slot '+(got?"filled":(c.hint?"ghost":""))+'">'+(got||c.hint ? MEDS[m][0] : "?")+'</div>';
+    }).join("");
+    return '<div class="big-emoji">'+pe+'</div><p class="big-name">'+esc(patName(c.patient))+'</p>'+
+      '<div class="bubble"><span>'+c.ail.e+'</span><span>'+esc(ailName(c.ail))+'</span></div>'+
+      '<div class="slots">'+slots+'</div><p class="hint">'+t.needs+'</p>'+
+      (c.hint?'':'<div class="choice"><button class="pill light" type="button" data-act="clinicHint">'+t.hint+'</button></div>');
+  },
+  clinicHealed: code => ()=>'<div class="big-emoji">'+PATIENTS[code][0]+'</div><p class="big-name">'+esc(T().clinic.healed(patName(code)))+'</p><div class="mid-emoji">🩷✨</div>',
+  huntSetup: ()=>{
+    const t = T().treasure;
+    return '<div class="big-emoji">🗺️</div><p class="big-name">'+t.setup+'</p><div class="choice">'+
+      [3,5,8].map(n=>'<button class="pill '+(S.clues===n?"":"light")+'" type="button" data-act="clues" data-n="'+n+'">'+n+'</button>').join("")+'</div>'+
+      '<div class="choice"><button class="pill" type="button" data-act="huntStart">'+t.start+'</button></div>';
+  },
+  huntClue: ()=>{
+    const h = hunt, t = T().treasure, code = h.route[h.idx], last = h.route[h.route.length-1];
+    const dots = h.route.map((_,i)=>'<i class="'+(i<h.idx?"done":(i===h.idx?"now":""))+'"></i>').join("");
+    return '<div class="dots" aria-hidden="true">'+dots+'</div><p class="hint">'+t.clue+' '+(h.idx+1)+' / '+h.route.length+'</p>'+
+      '<div class="riddle">'+esc(riddle(code))+'</div>'+
+      (h.hint?'<div class="mid-emoji">'+SPOTS[code][0]+'</div>':'')+
+      '<div class="choice">'+(h.hint?'':'<button class="pill light" type="button" data-act="huntHint">'+t.hint+'</button>')+
+      '<button class="pill light" type="button" data-act="huntParents">'+t.parents+'</button></div>'+
+      (h.parents?'<p class="small">'+esc(t.hideAt(SPOTS[last][0]+" "+spotName(last)))+'</p>':'');
+  },
+  huntFound: code => ()=>'<div class="big-emoji">'+SPOTS[code][0]+'</div><p class="big-name">'+esc(T().treasure.found(spotName(code)))+'</p>',
+  huntDone: ()=>'<div class="big-emoji">💎</div><p class="big-name">'+T().treasure.treasure+'</p><p class="hint">'+T().treasure.treasureText+'</p>'+
+      '<div class="choice"><button class="pill" type="button" data-act="huntAgain">'+T().treasure.again+'</button></div>'
+};
+function err(titleFn, spoken){ SFX.error(); view(V.msg("🙈", titleFn), "err shake"); say(spoken); }
+function modeIdleView(){ return S.mode==="shop" ? V.idle : S.mode==="clinic" ? (clinic ? V.clinicCase : V.clinicIdle) : (hunt && !hunt.done ? V.huntClue : hunt && hunt.done ? V.huntDone : V.huntSetup); }
+
+/* ================= Rendering ================= */
+function langButtons(){ return Object.keys(L).map(k=>'<button type="button" data-lang="'+k+'" aria-pressed="'+(k===S.lang)+'" lang="'+k+'">'+L[k].label+'</button>').join(""); }
+function modeButtons(){
+  const em = {shop:"🛒",clinic:"🏥",treasure:"🗺️"};
+  return ["shop","clinic","treasure"].map(m=>'<button type="button" data-mode="'+m+'" aria-pressed="'+(S.mode===m)+'"><span class="me" aria-hidden="true">'+em[m]+'</span><span class="ml">'+T().modes[m]+'</span></button>').join("");
+}
+function applyLang(){
+  const t = T();
+  document.documentElement.lang = S.lang; document.documentElement.dir = t.dir; document.body.dataset.mode = S.mode;
+  $("brand").textContent = t.brand;
+  $("startTitle").textContent = t.startTitle; $("startText").textContent = t.startText; $("startBtn").textContent = t.startBtn; $("startNote").textContent = t.startNote;
+  $("closedTitle").textContent = t.closedTitle; $("closedText").textContent = t.closedText;
+  [["fsBtn",t.fs],["gearBtn",t.gear],["closedGear",t.gear]].forEach(([id,l])=>{ $(id).setAttribute("aria-label",l); $(id).title=l; });
+  $("langsTop").innerHTML = langButtons(); $("langsStart").innerHTML = langButtons(); $("modes").innerHTML = modeButtons();
+  render(); if(lastView) drawView(""); if(!$("panelOv").hidden) renderPanel();
+  if(!$("recOv").hidden && lastTicket){ $("recSheet").innerHTML = lastTicket() + ticketBtn(); bindTicket(); }
+}
+function render(){
+  const t = T();
+  document.body.dataset.mode = S.mode;
+  // display
+  if(S.mode==="shop"){
+    const v = total();
+    $("lcdLabel").textContent = t.total; $("lcdValue").textContent = v; $("lcdUnit").textContent = "★";
+    $("lcdSub").textContent = cash>0 ? t.cashLine(cash, Math.max(0,v-cash)) : (pending ? (pending.type==="bonus"?t.pendBonus:t.pendBalance) : "");
+  }else if(S.mode==="clinic"){
+    const n = Object.values(S.healed).reduce((a,b)=>a+b,0);
+    $("lcdLabel").textContent = t.clinic.healedToday; $("lcdValue").textContent = n; $("lcdUnit").textContent = "🩷"; $("lcdSub").textContent = "";
+  }else{
+    $("lcdLabel").textContent = t.treasure.clue; $("lcdUnit").textContent = "🗺️";
+    $("lcdValue").textContent = hunt ? Math.min(hunt.idx+1, hunt.route.length)+"/"+hunt.route.length : "–";
+    $("lcdSub").textContent = hunt && !hunt.done ? t.treasure.left(hunt.route.length-hunt.idx) : "";
+  }
+  renderSide();
+  // bank cards
+  $("bank").innerHTML = Object.keys(KIDS).map(code=>{
+    const h = S.history.find(x=>x.kid===code);
+    const last = h ? (h.amount>0?"+":"")+h.amount+" ★  "+txLabel(h) : t.noTx;
+    return '<div class="card '+KIDS[code].cls+'" id="card'+code+'"><span class="chipm" aria-hidden="true"></span>'+
+      '<div class="ctext"><div class="who">'+esc(kname(code))+'</div><div class="last">'+esc(last)+'</div></div>'+
+      '<div class="bal">'+S.balances[code]+' <span class="st">★</span></div></div>';
+  }).join("");
+}
+function renderSide(){
+  const t = T(), side = $("side");
+  if(S.mode==="shop"){
+    let m = "";
+    if(mission){
+      const done = mission.items.every(c=>mission.got.includes(c));
+      m = '<div class="mission"><div class="mt"><span>🎯 '+t.missionTitle+'</span><span>+'+MISSION_BONUS+' ★</span></div><div class="chips">'+
+        mission.items.map(c=>'<span class="chip-i '+(mission.got.includes(c)?"got":"")+'">'+PRODUCTS[c][0]+' '+esc(pname(c))+'</span>').join("")+'</div>'+
+        '<div class="small">'+(done?t.missionDone:t.missionHint)+'</div></div>';
+    }
+    const items = !cart.length ? '<li class="empty"><span class="ee">🧾</span><b>'+t.emptyBill+'</b><span>'+t.emptyBillHint+'</span></li>'
+      : cart.map((c,i)=>'<li class="'+(i===cart.length-1?"new":"")+'"><span class="e">'+PRODUCTS[c][0]+'</span><span class="n">'+esc(pname(c))+'</span><span class="p star">'+PRODUCTS[c][1]+'</span></li>').join("");
+    side.innerHTML = '<div class="rhead"><h2>'+t.receipt+'</h2><span class="rno">#'+String(S.receiptNo).padStart(4,"0")+'</span></div>'+
+      '<div class="rsub">'+(cart.length?t.items(cart.length):"")+'</div>'+m+'<ul class="items" id="items">'+items+'</ul>'+
+      '<div class="sum"><span>'+t.sum+'</span><span>'+t.stars(total())+'</span></div>';
+    const it = $("items"); it.scrollTop = it.scrollHeight;
+  }else if(S.mode==="clinic"){
+    const list = Object.keys(PATIENTS).map(c=>{
+      const n = S.healed[c]||0, now = clinic && clinic.patient===c;
+      return '<li class="'+(now?"new":"")+'"><span class="e">'+PATIENTS[c][0]+'</span><span class="n">'+esc(patName(c))+'</span><span class="p">'+(n?t.clinic.sticker(n):"–")+'</span></li>';
+    }).join("");
+    side.innerHTML = '<div class="rhead"><h2>'+t.clinic.side+'</h2><span class="rno">🩺</span></div><div class="rsub"></div><ul class="items">'+list+'</ul>'+
+      '<div class="sum"><span>'+t.clinic.healedToday+'</span><span>'+Object.values(S.healed).reduce((a,b)=>a+b,0)+' 🩷</span></div>';
+  }else{
+    const rows = hunt ? hunt.route.map((c,i)=>{
+      const found = i < hunt.idx || hunt.done;
+      return '<li class="'+(i===hunt.idx && !hunt.done?"new":"")+'"><span class="e">'+(found?SPOTS[c][0]:"❔")+'</span><span class="n">'+(found?esc(spotName(c)):t.treasure.clue+" "+(i+1))+'</span><span class="p">'+(found?"✓":"")+'</span></li>';
+    }).join("") + '<li><span class="e">'+(hunt.done?"💎":"🎁")+'</span><span class="n">'+t.treasure.treasure+'</span><span class="p"></span></li>'
+      : '<li class="empty"><span class="ee">🗺️</span><span>'+t.treasure.idleSide+'</span></li>';
+    side.innerHTML = '<div class="rhead"><h2>'+t.treasure.side+'</h2><span class="rno">🧭</span></div><div class="rsub"></div><ul class="items">'+rows+'</ul>';
+  }
+}
+function txLabel(h){ const t=T(); return h.what==="bonus"?t.txBonus : h.what==="cash"?t.txCash : h.what==="mission"?t.txMission : t.items(h.n||0); }
+function flashCard(code){ const c=$("card"+code); if(c){ c.classList.remove("flash"); void c.offsetWidth; c.classList.add("flash"); } }
+
+let toastT=null;
+function toast(msg){
+  let el=document.querySelector(".toast"); if(!el){ el=document.createElement("div"); el.className="toast"; el.setAttribute("role","status"); document.body.appendChild(el); }
+  el.textContent=msg; el.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>el.hidden=true,2600);
+}
+
+/* ================= Ticket overlay ================= */
+let lastTicket = null;
+const ticketBtn = () => '<button class="cta" id="recOk" type="button">'+T().newBill+'</button>';
+function bindTicket(){ const b=$("recOk"); if(b) b.onclick = closeTicket; }
+function openTicket(fn){
+  lastTicket = fn; $("recSheet").innerHTML = fn() + ticketBtn(); $("recOv").hidden = false; bindTicket();
+  clearTimeout(receiptTimer); receiptTimer = setTimeout(closeTicket, 10000);
+}
+function closeTicket(){
+  clearTimeout(receiptTimer); if($("recOv").hidden) return;
+  $("recOv").hidden = true; lastTicket = null; cart=[]; cash=0; S.receiptNo++; save(); render(); view(V.idle);
+}
+const ticketLines = snap => snap.map(c=>'<div><span>'+PRODUCTS[c][0]+' '+esc(pname(c))+'</span><span>'+PRODUCTS[c][1]+' ★</span></div>').join("");
+
+/* ================= Modes ================= */
+function setMode(m, speak){
+  if(!["shop","clinic","treasure"].includes(m)) return;
+  if(!$("recOv").hidden) closeTicket();
+  S.mode = m; save(); pending = null;
+  $("modes").innerHTML = modeButtons(); render(); view(modeIdleView());
+  SFX.soft(); if(speak!==false) say(T().say.mode[m]);
+}
+function newMission(){
+  const codes = shuffle(Object.keys(PRODUCTS).filter(c=>PRODUCTS[c][1]<=6)).slice(0,3);
+  mission = {items:codes, got:cart.filter(c=>codes.includes(c))};
+  SFX.ding(); render();
+  view(V.msg("🎯", ()=>T().missionTitle, ()=>mission.items.map(c=>PRODUCTS[c][0]+" "+esc(pname(c))).join(" · ")));
+  say(T().say.mission(mission.items.map(c=>pname(c)).join("، ")));
+}
+function startHunt(){
+  const n = Math.min(S.clues||5, Object.keys(SPOTS).length);
+  hunt = {route: shuffle(Object.keys(SPOTS)).slice(0,n), idx:0, hint:false, parents:false, done:false};
+  SFX.ding(); render(); view(V.huntClue); say(riddle(hunt.route[0]));
+}
+
+/* ================= Scan handling ================= */
+const normalize = s => String(s).replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[۰-۹]/g,d=>"۰۱۲۳۴۵۶۷۸۹".indexOf(d)).replace(/\D/g,"");
+function log(kid, amount, what, n){ S.history.unshift({ts:Date.now(), kid, amount, what, n}); S.history = S.history.slice(0,60); save(); }
+
+function handle(raw){
+  const code = normalize(raw); if(!code || closed) return;
+  if(pending && Date.now()>pending.until) pending = null;
+
+  // mode cards and universal controls work everywhere
+  const act = CTRL[code];
+  if(act && act.startsWith("m:")){ setMode(act.slice(2)); return; }
+
+  // cards from another mode switch to it automatically
+  if(PRODUCTS[code] || BILLS[code] || act==="undo" || act==="mission" || act==="bonus" || act==="balance"){ if(S.mode!=="shop") setMode("shop", false); }
+  if(PATIENTS[code] || MEDS[code]){ if(S.mode!=="clinic") setMode("clinic", false); }
+  if(SPOTS[code]){ if(S.mode!=="treasure") setMode("treasure", false); }
+
+  if(S.mode==="clinic") return handleClinic(code, act);
+  if(S.mode==="treasure") return handleTreasure(code, act);
+  handleShop(code, act);
+}
+
+function handleShop(code, act){
+  const ticketOpen = !$("recOv").hidden;
+  if(PRODUCTS[code]){
+    if(ticketOpen) closeTicket();
+    if(cash>0){ err(()=>T().payFirst, T().say.payFirst); return; }
+    cart.push(code);
+    let missionJustDone = false;
+    if(mission && mission.items.includes(code) && !mission.got.includes(code)){
+      mission.got.push(code); missionJustDone = mission.items.every(c=>mission.got.includes(c));
+    }
+    SFX.beep(); render(); view(V.product(code));
+    if(missionJustDone){ setTimeout(()=>{ SFX.ding(); say(T().say.missionDone); }, 900); }
+    say(T().say.product(pname(code), PRODUCTS[code][1]));
+    return;
+  }
+  if(BILLS[code]){
+    if(ticketOpen) return;
+    if(!cart.length){ err(()=>T().emptyBill, T().say.empty); return; }
+    const v = BILLS[code], sumV = total(); cash += v; SFX.coin();
+    if(cash >= sumV){
+      const change = cash - sumV, got = cash, snap = cart.slice();
+      SFX.kaching(); confetti(); log(null, -sumV, "cash");
+      openTicket(()=>'<div class="big-emoji" style="font-size:4.5rem">💵</div><div class="paid">'+T().paidCash+'</div>'+
+        '<div class="rlines">'+ticketLines(snap)+'<div class="strong"><span>'+T().sum+'</span><span>'+sumV+' ★</span></div>'+
+        '<div><span>'+T().received+'</span><span>'+got+' ★</span></div><div class="strong"><span>'+T().change+'</span><span>'+change+' ★</span></div></div>'+
+        '<p class="change">'+(change>0 ? T().giveChange(T().stars(change)) : T().exact)+'</p>');
+      say(T().say.cashDone(change));
+    }else{
+      render(); view(V.msg("💵", ()=>T().recv(v), ()=>T().left(total()-cash)));
+      say(T().say.recv(v, sumV-cash));
+    }
+    return;
+  }
+  if(KIDS[code]){
+    const nm = kname(code);
+    if(pending && pending.type==="bonus"){
+      pending=null; S.balances[code]+=BONUS; log(code, BONUS, "bonus"); save(); render(); flashCard(code); SFX.kaching(); confetti();
+      view(V.msg("⭐", ()=>T().bonusFor(esc(kname(code))), null, ()=>"+"+BONUS)); say(T().say.bonus(nm));
+      return;
+    }
+    if((pending && pending.type==="balance") || !cart.length){
+      pending=null; render(); flashCard(code); SFX.soft();
+      view(V.msg("🏦", ()=>T().balanceOf(esc(kname(code))), null, ()=>S.balances[code])); say(T().say.balance(nm, S.balances[code]));
+      return;
+    }
+    if(ticketOpen) return;
+    if(cash>0){ err(()=>T().cashStarted, T().say.cashStarted); return; }
+    const sumV = total(), bal = S.balances[code];
+    if(bal < sumV){ flashCard(code); err(()=>T().notEnough(esc(kname(code)), sumV-bal), T().say.notEnough(nm, sumV-bal)); return; }
+    const missionOk = mission && mission.items.every(c=>mission.got.includes(c));
+    S.balances[code] = bal - sumV; log(code, -sumV, "items", cart.length);
+    if(missionOk){ S.balances[code] += MISSION_BONUS; log(code, MISSION_BONUS, "mission"); mission = null; }
+    save(); render(); flashCard(code); SFX.kaching(); confetti();
+    const snap = cart.slice(), now = S.balances[code];
+    openTicket(()=>'<div class="big-emoji" style="font-size:4.5rem">💳</div><div class="paid">'+T().paidCard+'</div><p><b>'+esc(T().cardOf(kname(code)))+'</b></p>'+
+      '<div class="rlines">'+ticketLines(snap)+'<div class="strong"><span>'+T().sum+'</span><span>'+sumV+' ★</span></div>'+
+      (missionOk?'<div><span>🎯 '+T().missionBonus+'</span><span>+'+MISSION_BONUS+' ★</span></div>':'')+
+      '<div><span>'+T().before+'</span><span>'+bal+' ★</span></div><div class="strong"><span>'+T().after+'</span><span>'+now+' ★</span></div></div>');
+    say(T().say.paid(nm, now));
+    return;
+  }
+  if(act==="undo"){
+    if(cash>0){ err(()=>T().noUndoPaying, T().noUndoPaying); return; }
+    const r = cart.pop(); if(!r){ err(()=>T().nothingToUndo, T().nothingToUndo); return; }
+    if(mission && !cart.includes(r)) mission.got = mission.got.filter(c=>c!==r);
+    SFX.soft(); render(); view(V.msg("↩️", ()=>T().removed(esc(pname(r))))); say(T().say.removed(pname(r)));
+    return;
+  }
+  if(act==="clear"){
+    if(ticketOpen){ closeTicket(); } else { cart=[]; cash=0; if(mission) mission.got=[]; }
+    pending=null; SFX.soft(); render(); view(V.idle); say(T().say.newBill);
+    return;
+  }
+  if(act==="mission"){ if(ticketOpen) closeTicket(); newMission(); return; }
+  if(act==="bonus" || act==="balance"){
+    pending = {type:act, until:Date.now()+15000}; SFX.soft(); render();
+    view(V.msg(act==="bonus"?"⭐":"🔍", ()=>act==="bonus"?T().bonusTitle:T().balanceTitle, ()=>T().scanCard));
+    say(act==="bonus"?T().say.pendBonus:T().say.pendBalance);
+    return;
+  }
+  err(()=>T().unknown(code), T().say.unknown);
+}
+
+function handleClinic(code, act){
+  const t = T().clinic;
+  if(PATIENTS[code]){
+    const prev = clinic && clinic.patient===code ? clinic.ail : null;
+    const ail = shuffle(AILMENTS.filter(a=>a!==prev))[0];
+    clinic = {patient:code, ail, got:[], wrong:0, hint:false};
+    SFX.ding(); render(); view(V.clinicCase);
+    say(T().say.patient(patName(code), ailName(ail)));
+    return;
+  }
+  if(MEDS[code]){
+    if(!clinic){ err(()=>t.needPatient, T().say.needPatient); return; }
+    if(clinic.got.includes(code)){ SFX.soft(); toast(t.already); return; }
+    if(clinic.ail.need.includes(code)){
+      clinic.got.push(code);
+      if(clinic.ail.need.every(m=>clinic.got.includes(m))){
+        const p = clinic.patient; S.healed[p] = (S.healed[p]||0)+1; S.healedDay = today(); save(); clinic = null;
+        SFX.heal(); confetti(["#FF8FB8","#FFB627","#1FC3A4","#FFFFFF","#F0374F"]); render(); view(V.clinicHealed(p)); say(T().say.healed(patName(p)));
+      }else{ SFX.ding(); render(); view(V.clinicCase); say(T().say.correct(medName(code))); }
+    }else{
+      clinic.wrong++; if(clinic.wrong>=2) clinic.hint = true;
+      SFX.error(); toast(t.wrong(MEDS[code][0]+" "+medName(code), ailName(clinic.ail))); view(V.clinicCase, "shake"); say(T().say.wrong);
+    }
+    return;
+  }
+  if(act==="clear"){ clinic = null; SFX.soft(); render(); view(V.clinicIdle); return; }
+  if(KIDS[code]){ setMode("shop", false); handleShop(code, act); return; }
+  err(()=>T().unknown(code), T().say.unknown);
+}
+
+function handleTreasure(code, act){
+  const t = T().treasure;
+  if(act==="clear"){ hunt = null; SFX.soft(); render(); view(V.huntSetup); return; }
+  if(SPOTS[code]){
+    if(!hunt || hunt.done){ startHunt(); if(code!==hunt.route[0]) return; }
+    if(code === hunt.route[hunt.idx]){
+      hunt.idx++; hunt.hint = false;
+      if(hunt.idx >= hunt.route.length){
+        hunt.done = true; SFX.fanfare(); confetti(); confetti(); render(); view(V.huntDone); say(T().say.treasure);
+      }else{
+        SFX.ding(); render(); view(V.huntFound(code));
+        say(T().say.found+" "+riddle(hunt.route[hunt.idx]));
+        setTimeout(()=>{ if(hunt && !hunt.done && S.mode==="treasure") view(V.huntClue); }, 2200);
+      }
+    }else{
+      SFX.error(); toast(t.notHere); view(V.huntClue, "shake"); say(T().say.notHere);
+    }
+    return;
+  }
+  if(KIDS[code]){ setMode("shop", false); handleShop(code, act); return; }
+  err(()=>T().unknown(code), T().say.unknown);
+}
+
+/* stage buttons */
+document.addEventListener("click", e=>{
+  const b = e.target.closest && e.target.closest("[data-act]"); if(!b) return;
+  const a = b.dataset.act; audio();
+  if(a==="mission") newMission();
+  else if(a==="clinicHint" && clinic){ clinic.hint = true; view(V.clinicCase, ""); }
+  else if(a==="clues"){ S.clues = +b.dataset.n; save(); SFX.soft(); view(V.huntSetup, ""); }
+  else if(a==="huntStart" || a==="huntAgain") startHunt();
+  else if(a==="huntHint" && hunt){ hunt.hint = true; view(V.huntClue, ""); }
+  else if(a==="huntParents" && hunt){ hunt.parents = !hunt.parents; view(V.huntClue, ""); }
+  b.blur && b.blur();
+});
+
+/* ================= Scanner input: HID keyboard, digits then Enter ================= */
+let buf = "", lastKey = 0;
+document.addEventListener("keydown", e=>{
+  const tag = (e.target && e.target.tagName) || "";
+  if(tag==="INPUT" || tag==="TEXTAREA" || tag==="SELECT") return;
+  if(e.metaKey || e.ctrlKey || e.altKey) return;
+  const now = Date.now(); if(now - lastKey > 800) buf = ""; lastKey = now;
+  if(e.key==="Enter" || e.key==="Tab"){
+    if(!buf) return;
+    e.preventDefault(); const c = buf; buf = "";
+    if(closed) return;
+    if(!$("startOv").hidden) startGame();
+    if(!$("panelOv").hidden) closePanel();
+    handle(c); return;
+  }
+  if(e.key && e.key.length===1 && /[0-9٠-٩۰-۹]/.test(e.key)){ buf += e.key; e.preventDefault(); }
+});
+
+/* ================= Confetti (stars + ribbons) ================= */
+const fx = $("fx"), ctx = fx.getContext("2d"); let parts=[], raf=null;
+function confetti(colors){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const d = devicePixelRatio||1; fx.width = innerWidth*d; fx.height = innerHeight*d;
+  const cols = colors || ["#F0374F","#FFB627","#8E4DFF","#1FC3A4","#4BA3FF","#E0479E","#FFFFFF"];
+  for(let i=0;i<170;i++) parts.push({x:fx.width*(.3+Math.random()*.4), y:fx.height*.5, vx:(Math.random()-.5)*28*d, vy:(-Math.random()*24-9)*d,
+    r:(Math.random()*7+5)*d, c:cols[i%cols.length], a:Math.random()*6, s:Math.random()<.3, life:0});
+  if(!raf) tick();
+}
+function star(r){ ctx.beginPath(); for(let i=0;i<10;i++){ const rr = i%2? r*.45 : r; const a = i*Math.PI/5 - Math.PI/2; ctx.lineTo(Math.cos(a)*rr, Math.sin(a)*rr); } ctx.closePath(); ctx.fill(); }
+function tick(){
+  const d = devicePixelRatio||1; ctx.clearRect(0,0,fx.width,fx.height);
+  parts.forEach(p=>{ p.vy += .9*d; p.vx *= .985; p.x += p.vx; p.y += p.vy; p.a += .18; p.life++;
+    ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=p.c; if(p.s) star(p.r*.9); else ctx.fillRect(-p.r/2,-p.r/4,p.r,p.r/2); ctx.restore(); });
+  parts = parts.filter(p=>p.y < fx.height+50 && p.life < 260);
+  raf = parts.length ? requestAnimationFrame(tick) : (ctx.clearRect(0,0,fx.width,fx.height), null);
+}
+
+/* ================= Start, wake lock, full screen, closing time ================= */
+let wake = null;
+async function keepAwake(){ try{ if("wakeLock" in navigator) wake = await navigator.wakeLock.request("screen"); }catch(e){} }
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible" && $("startOv").hidden) keepAwake(); });
+function startGame(){
+  if($("startOv").hidden) return;
+  $("startOv").hidden = true; audio(); SFX.soft(); keepAwake(); sessionStart = Date.now(); say(T().say.welcome);
+  if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
+}
+function checkClosing(){
+  if(!S.limit || !sessionStart || closed) return;
+  if(Date.now() - sessionStart >= S.limit*60000){
+    closed = true; $("recOv").hidden = true; $("closedOv").hidden = false; SFX.soft(); say(T().say.closed);
+  }
+}
+setInterval(checkClosing, 10000);
+function reopen(){ closed = false; sessionStart = Date.now(); $("closedOv").hidden = true; toast(T().reopened); }
+$("startBtn").onclick = startGame;
+$("fsBtn").onclick = async ()=>{
+  try{ if(!document.fullscreenElement) await document.documentElement.requestFullscreen(); else await document.exitFullscreen(); }
+  catch(e){ toast(T().fsNo); }
+};
+document.addEventListener("click", e=>{
+  const lb = e.target.closest && e.target.closest("[data-lang]");
+  if(lb){ S.lang = lb.dataset.lang; save(); applyLang(); if($("startOv").hidden){ audio(); SFX.soft(); } return; }
+  const mb = e.target.closest && e.target.closest("[data-mode]");
+  if(mb){ audio(); setMode(mb.dataset.mode); mb.blur && mb.blur(); }
+});
+
+/* ================= Parent panel ================= */
+function renderVoiceInfo(){
+  const el = $("voiceInfo"); if(!el) return; const t = T();
+  if(!("speechSynthesis" in window)){ el.textContent = t.noTTS; return; }
+  const v = voiceFor(S.lang); el.textContent = v ? t.voiceUsing(v.name) : t.noVoice;
+}
+function renderPanel(){
+  const t = T();
+  $("pTitle").textContent=t.pTitle; $("pTest").textContent=t.pTest; $("manualBtn").textContent=t.scan; $("pBal").textContent=t.pBal; $("saveBal").textContent=t.saveBal;
+  $("pTime").textContent=t.pTime; $("reopenBtn").textContent=t.reopen;
+  $("pSound").textContent=t.pSound; $("pCodes").textContent=t.pCodes; $("pHist").textContent=t.pHist; $("closePanel").textContent=t.back;
+  $("lbl9001").textContent = kname("9001"); $("lbl9002").textContent = kname("9002");
+  $("bal9001").value = S.balances["9001"]; $("bal9002").value = S.balances["9002"];
+  $("limitSel").innerHTML = [0,15,30,45,60].map(n=>'<option value="'+n+'"'+(S.limit===n?" selected":"")+'>'+(n?t.limitMin(n):t.limitOff)+'</option>').join("");
+  $("timeInfo").textContent = S.limit && sessionStart ? t.timeLeft(Math.max(0, Math.ceil((S.limit*60000-(Date.now()-sessionStart))/60000))) : t.timeOff;
+  $("voiceBtn").textContent = S.voice ? t.voiceOn : t.voiceOff; $("sfxBtn").textContent = S.sfx ? t.sfxOn : t.sfxOff;
+  renderVoiceInfo();
+  $("ctrlList").innerHTML = Object.entries(CTRL).map(([c,a])=>'<b>'+c+'</b><span>'+t.ctrl[a]+'</span>').join("")+
+    '<b>9001 / 9002</b><span>'+t.rows.cards+'</span><b>7001–7020</b><span>'+t.rows.bills+'</span><b>1001–1020</b><span>'+t.rows.prod+'</span>'+
+    '<b>3001–3006</b><span>'+t.rows.pat+'</span><b>4001–4008</b><span>'+t.rows.med+'</span><b>5001–5010</b><span>'+t.rows.spot+'</span>';
+  $("histList").innerHTML = S.history.length ? S.history.slice(0,10).map(h=>{
+    const time = new Date(h.ts).toLocaleTimeString(S.lang+"-u-nu-latn",{hour:"2-digit",minute:"2-digit"});
+    return time+" · "+esc(h.kid?kname(h.kid):t.txCash)+" · "+(h.amount>0?"+":"")+h.amount+" ★ · "+txLabel(h);
+  }).join("<br>") : t.noTx;
+  resetUI(false);
+}
+$("quickCodes").innerHTML = ["1001","1011","9001","7005","8030","3001","4002","4004","5001"].map(c=>'<button class="ghost" type="button" data-code="'+c+'">'+c+'</button>').join("");
+$("quickCodes").addEventListener("click", e=>{ const c = e.target.dataset && e.target.dataset.code; if(c){ closePanel(); if(!$("startOv").hidden) startGame(); handle(c); } });
+function openPanel(){ renderPanel(); $("panelOv").hidden = false; }
+$("gearBtn").onclick = openPanel; $("closedGear").onclick = openPanel;
+function closePanel(){ $("panelOv").hidden = true; if(document.activeElement && document.activeElement.blur) document.activeElement.blur(); }
+$("closePanel").onclick = closePanel;
+$("manualBtn").onclick = ()=>{ const v = $("manualCode").value; $("manualCode").value = ""; closePanel(); if(!$("startOv").hidden) startGame(); handle(v); };
+$("manualCode").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); $("manualBtn").click(); } });
+$("saveBal").onclick = ()=>{
+  const f = parseInt($("bal9001").value,10), s = parseInt($("bal9002").value,10);
+  if(isNaN(f)||isNaN(s)||f<0||s<0){ toast(T().badNum); return; }
+  S.balances["9001"]=f; S.balances["9002"]=s; save(); render(); toast(T().saved);
+};
+$("limitSel").onchange = e=>{ S.limit = +e.target.value; save(); if(!sessionStart) sessionStart = Date.now(); renderPanel(); };
+$("reopenBtn").onclick = ()=>{ reopen(); renderPanel(); };
+$("voiceBtn").onclick = ()=>{ S.voice=!S.voice; save(); renderPanel(); };
+$("sfxBtn").onclick = ()=>{ S.sfx=!S.sfx; save(); renderPanel(); };
+function resetUI(confirming){
+  const t = T(), row = $("resetRow");
+  row.innerHTML = confirming
+    ? '<span>'+t.resetAsk+'</span><button class="ghost danger" type="button" id="resetYes">'+t.resetYes+'</button><button class="ghost" type="button" id="resetNo">'+t.cancel+'</button>'
+    : '<button class="ghost danger" type="button" id="resetBtn">'+t.reset+'</button>';
+  if(confirming){
+    $("resetYes").onclick = ()=>{ const keep={voice:S.voice,sfx:S.sfx,lang:S.lang,mode:S.mode,limit:S.limit,clues:S.clues}; S = Object.assign(defaults(), keep); save();
+      cart=[]; cash=0; pending=null; mission=null; clinic=null; hunt=null; render(); view(modeIdleView()); renderPanel(); toast(T().resetDone); };
+    $("resetNo").onclick = ()=>resetUI(false);
+  } else $("resetBtn").onclick = ()=>resetUI(true);
+}
+
+/* ================= Boot ================= */
+lastView = modeIdleView(); applyLang(); drawView("");
+</script>
+
+</body>
+</html>
