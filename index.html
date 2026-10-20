@@ -15,7 +15,6 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Baloo+Bhaijaan+2:wght@600;800&family=Readex+Pro:wght@400;500;700&display=swap">
 <style>
 [hidden]{display:none!important}
-img{max-width:100%}
 
 /* Sugar Ledger, v3. A toy market stall that can turn into a clinic or a treasure map.
    Awning over a stage where the action bursts in on a saffron sunburst; a plum display above it;
@@ -209,6 +208,21 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .codes{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:.92rem}
 .codes b{font-variant-numeric:tabular-nums;direction:ltr;text-align:start;white-space:nowrap}
 .toast{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));inset-inline:0;margin-inline:auto;width:max-content;max-width:90%;background:var(--ink);color:#fff;padding:10px 18px;border-radius:14px;z-index:30}
+img.fx{width:1em;height:1em;object-fit:contain;vertical-align:-.14em;display:inline-block;-webkit-user-drag:none;user-select:none}
+.big-emoji img.fx,.mid-emoji img.fx{vertical-align:middle;filter:drop-shadow(0 14px 14px #2A1B4A30)}
+.modes .me img.fx{width:1.15em;height:1.15em}
+.gearwrap{position:relative}
+.gearwrap svg{position:absolute;inset:-3px;width:calc(100% + 6px);height:calc(100% + 6px);pointer-events:none;rotate:-90deg}
+.gearwrap circle{fill:none;stroke:var(--saffron);stroke-width:4;stroke-dasharray:151;stroke-dashoffset:151;stroke-linecap:round}
+.gearwrap.holding circle{transition:stroke-dashoffset 1.1s linear;stroke-dashoffset:0}
+.famrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line)}
+.famrow .ft{font-size:.92rem;line-height:1.4}
+.famrow .ft small{display:block;color:var(--ok);font-size:.78rem}
+.famrow .fb{display:flex;gap:6px}
+.famrow .ghost{padding:6px 10px}
+.rec{border-color:var(--pom);color:var(--pom)}
+.rec.on{background:var(--pom);color:#fff;animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.6}}
 canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:25;width:100%;height:100%}
 
 @media (max-width:980px){ .modes button .ml{display:none} .modes button{padding:0 12px} }
@@ -235,7 +249,7 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:25;width:100%;heigh
     <div class="tools">
       <div class="langs" role="group" aria-label="Language" id="langsTop"></div>
       <button class="iconbtn" id="fsBtn" type="button">⛶</button>
-      <button class="iconbtn" id="gearBtn" type="button">⚙︎</button>
+      <span class="gearwrap" id="gearWrap"><button class="iconbtn" id="gearBtn" type="button">⚙︎</button><svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/></svg></span>
     </div>
   </header>
 
@@ -276,7 +290,7 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:25;width:100%;heigh
     <h3 id="closedTitle"></h3>
     <p id="closedText"></p>
   </div>
-  <button class="iconbtn gearlink" id="closedGear" type="button">⚙︎</button>
+  <span class="gearwrap gearlink" id="closedWrap" style="position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));inset-inline-end:max(16px,env(safe-area-inset-right,0px))"><button class="iconbtn" id="closedGear" type="button" style="background:#ffffff22;color:#fff">⚙︎</button><svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/></svg></span>
 </div>
 
 <div class="overlay" id="panelOv" hidden>
@@ -305,6 +319,11 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:25;width:100%;heigh
       <h4 id="pSound"></h4>
       <div class="row"><button class="ghost" id="voiceBtn" type="button"></button><button class="ghost" id="sfxBtn" type="button"></button></div>
       <div class="small" id="voiceInfo"></div>
+    </section>
+    <section>
+      <h4 id="pFamily"></h4>
+      <div class="small" id="famInfo"></div>
+      <div id="famList"></div>
     </section>
     <section>
       <h4 id="pCodes"></h4>
@@ -404,6 +423,7 @@ const L = {
     again:"مغامرة جديدة", hint:"💡 تلميح", left:n=>"بقي "+n, idleSide:"امسحي الأكواد المخبأة في البيت بالترتيب"},
   ctrl:{undo:"↩️ حذف آخر منتج", clear:"🧹 فاتورة جديدة / إعادة", bonus:"⭐ مكافأة +10 ثم امسح البطاقة", balance:"🔍 كشف حساب ثم امسح البطاقة",
         mission:"🎯 قائمة تسوق جديدة", "m:shop":"🛒 وضع الدكان", "m:clinic":"🏥 وضع العيادة", "m:treasure":"🗺️ وضع الكنز"},
+  holdHint:"اضغط مطولاً على ⚙︎ لفتح لوحة الأهل", pFamily:"🎙️ صوت العائلة", famInfo:"سجّل بصوتك أو بصوت ماما. التسجيل يُحفظ على هذا الجهاز فقط ويحلّ محل الصوت الآلي.", famRec:"● سجّل", famStop:"■ أوقف", famPlay:"▶", famDel:"🗑", famHas:"✓ بصوت العائلة", micNo:"الميكروفون غير متاح هنا. افتح اللعبة من رابط GitHub على التابلت.", voiceHuman:n=>"🎧 أصوات بشرية جاهزة ("+n+" مقطعاً)",
   pTitle:"لوحة الأهل", pTest:"تجربة بدون ماسح", scan:"امسح", pBal:"الأرصدة", saveBal:"حفظ الأرصدة", saved:"تم حفظ الأرصدة", badNum:"اكتب رقماً صحيحاً من 0 فما فوق",
   pTime:"وقت الإغلاق", limitOff:"بدون وقت محدد", limitMin:n=>"يغلق الدكان بعد "+n+" دقيقة", reopen:"افتح الدكان من جديد",
   timeLeft:n=>"باقي "+n+" دقيقة على الإغلاق", timeOff:"لا يوجد وقت إغلاق", reopened:"فُتح الدكان من جديد",
@@ -458,6 +478,7 @@ const L = {
     again:"New adventure", hint:"💡 Hint", left:n=>n+" left", idleSide:"Scan the codes hidden around the house, in order"},
   ctrl:{undo:"↩️ Remove last item", clear:"🧹 New receipt / restart", bonus:"⭐ Bonus +10, then scan a card", balance:"🔍 Balance check, then scan a card",
         mission:"🎯 New shopping list", "m:shop":"🛒 Shop mode", "m:clinic":"🏥 Clinic mode", "m:treasure":"🗺️ Treasure mode"},
+  holdHint:"Press and hold ⚙︎ to open the parents' panel", pFamily:"🎙️ Family voice", famInfo:"Record these lines in your own voice. Recordings stay on this device and replace the built-in voice.", famRec:"● Record", famStop:"■ Stop", famPlay:"▶", famDel:"🗑", famHas:"✓ Family voice", micNo:"The microphone isn't available here. Open the game from its GitHub link on the tablet.", voiceHuman:n=>"🎧 Human voices ready ("+n+" clips)",
   pTitle:"Parents' panel", pTest:"Try without a scanner", scan:"Scan", pBal:"Balances", saveBal:"Save balances", saved:"Balances saved", badNum:"Enter a whole number, 0 or more",
   pTime:"Closing time", limitOff:"No time limit", limitMin:n=>"Close the shop after "+n+" minutes", reopen:"Reopen the shop",
   timeLeft:n=>n+" minutes until closing", timeOff:"No closing time set", reopened:"Shop reopened",
@@ -512,6 +533,7 @@ const L = {
     again:"Neues Abenteuer", hint:"💡 Tipp", left:n=>"noch "+n, idleSide:"Scanne die versteckten Codes im Haus der Reihe nach"},
   ctrl:{undo:"↩️ Letzten Artikel entfernen", clear:"🧹 Neuer Bon / Neustart", bonus:"⭐ Bonus +10, dann Karte scannen", balance:"🔍 Kontostand, dann Karte scannen",
         mission:"🎯 Neue Einkaufsliste", "m:shop":"🛒 Laden", "m:clinic":"🏥 Arztpraxis", "m:treasure":"🗺️ Schatzsuche"},
+  holdHint:"⚙︎ lange drücken, um den Elternbereich zu öffnen", pFamily:"🎙️ Familienstimme", famInfo:"Sprich diese Sätze selbst ein. Die Aufnahmen bleiben auf diesem Gerät und ersetzen die eingebaute Stimme.", famRec:"● Aufnehmen", famStop:"■ Stopp", famPlay:"▶", famDel:"🗑", famHas:"✓ Familienstimme", micNo:"Das Mikrofon ist hier nicht verfügbar. Öffne das Spiel über den GitHub-Link auf dem Tablet.", voiceHuman:n=>"🎧 Menschliche Stimmen bereit ("+n+" Clips)",
   pTitle:"Elternbereich", pTest:"Ohne Scanner testen", scan:"Scannen", pBal:"Guthaben", saveBal:"Guthaben speichern", saved:"Guthaben gespeichert", badNum:"Bitte eine ganze Zahl ab 0 eingeben",
   pTime:"Ladenschluss", limitOff:"Keine Zeitgrenze", limitMin:n=>"Laden schließt nach "+n+" Minuten", reopen:"Laden wieder öffnen",
   timeLeft:n=>"Noch "+n+" Minuten bis Ladenschluss", timeOff:"Kein Ladenschluss eingestellt", reopened:"Laden wieder geöffnet",
@@ -579,32 +601,105 @@ function tone(f, start, dur, type, vol){
   o.connect(g).connect(ac.destination); o.start(t); o.stop(t+dur+.03);
 }
 const SFX = {
-  beep(){ tone(1760,0,.09,"square",.07); },
+  beep(){ tone(1760,0,.09,"square",.07); buzz(12); },
   coin(){ tone(1320,0,.08,"triangle",.2); tone(1980,.07,.2,"triangle",.17); },
-  error(){ tone(240,0,.16,"sawtooth",.1); tone(190,.17,.26,"sawtooth",.1); },
-  kaching(){ [988,1319,1568,2093].forEach((f,i)=>tone(f,i*.07,.35,"triangle",.15)); tone(2637,.32,.55,"sine",.11); },
+  error(){ tone(240,0,.16,"sawtooth",.1); tone(190,.17,.26,"sawtooth",.1); buzz([50,40,50]); },
+  kaching(){ [988,1319,1568,2093].forEach((f,i)=>tone(f,i*.07,.35,"triangle",.15)); tone(2637,.32,.55,"sine",.11); buzz([18,50,18,50,30]); },
   soft(){ tone(660,0,.12,"sine",.13); tone(880,.1,.18,"sine",.11); },
   heal(){ [523,659,784,1047,1319].forEach((f,i)=>tone(f,i*.09,.4,"sine",.14)); },
   ding(){ tone(1175,0,.25,"sine",.16); tone(1568,.12,.35,"sine",.13); },
   fanfare(){ [392,523,659,784,659,784,1047].forEach((f,i)=>tone(f,i*.12,.3,"triangle",.15)); tone(1568,.9,.9,"sine",.12); }
 };
 
-/* ================= Voice ================= */
+/* ================= Voice: human neural clips → family recordings → device TTS ================= */
 let voices = [];
 function loadVoices(){ if("speechSynthesis" in window){ voices = speechSynthesis.getVoices(); renderVoiceInfo(); } }
 if("speechSynthesis" in window){ loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
 function voiceFor(lang){ const re = L[lang].voice; return voices.find(v=>re.test(v.lang) && /google|enhanced|premium|natural/i.test(v.name)) || voices.find(v=>re.test(v.lang)) || null; }
-function say(text){
-  if(!S.voice) return; const v = voiceFor(S.lang); if(!v) return;
+function ttsSay(text){
+  if(!S.voice || !text) return; const v = voiceFor(S.lang); if(!v) return;
   try{ speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.voice=v; u.lang=v.lang; u.rate=.98; u.pitch=1.1; speechSynthesis.speak(u); }catch(e){}
 }
+const VOICE_BASE = "voice/";
+let VM = null;   // manifest: {ar:{key:text}, en:{...}, de:{...}}
+fetch(VOICE_BASE+"manifest.json").then(r=>r.ok?r.json():null).then(m=>{ VM = m; renderVoiceInfo(); }).catch(()=>{});
+const bufCache = new Map();
+function clipBuf(lang, key){
+  const id = lang+"/"+key;
+  if(bufCache.has(id)) return bufCache.get(id);
+  const pr = (async ()=>{
+    let ab = null;
+    const fam = await famGet(lang, key);
+    if(fam) ab = await fam.arrayBuffer();
+    else{
+      if(!VM || !VM[lang] || !(key in VM[lang]) || VM[lang][key]==="") return null;
+      const r = await fetch(VOICE_BASE+lang+"/"+key+".mp3"); if(!r.ok) return null;
+      ab = await r.arrayBuffer();
+    }
+    const ac = audio(); if(!ac) return null;
+    return await new Promise((res)=>ac.decodeAudioData(ab, res, ()=>res(null)));
+  })().catch(()=>null);
+  bufCache.set(id, pr); pr.then(b=>{ if(!b) bufCache.delete(id); });
+  return pr;
+}
+let speakGen = 0, liveSrc = [];
+function stopSpeech(){ liveSrc.forEach(x=>{ try{ x.stop(); }catch(e){} }); liveSrc = []; try{ speechSynthesis.cancel(); }catch(e){} }
+async function speak(tokens, fallback){
+  if(!S.voice) return;
+  const gen = ++speakGen, lang = S.lang; stopSpeech();
+  const keys = tokens.filter(k=>!(VM && VM[lang] && VM[lang][k]===""));
+  const famAny = await famHasAny(lang, keys);
+  if(gen!==speakGen) return;
+  if((VM && VM[lang]) || famAny){
+    const bufs = await Promise.all(keys.map(k=>clipBuf(lang,k)));
+    if(gen!==speakGen) return;
+    if(bufs.every(Boolean)){
+      const ac = audio(); let t = ac.currentTime + .04;
+      bufs.forEach((b,i)=>{ const src = ac.createBufferSource(); src.buffer = b; const g = ac.createGain(); g.gain.value = 1.15;
+        src.connect(g).connect(ac.destination); src.start(t); liveSrc.push(src); t += b.duration + (i < bufs.length-1 ? .09 : 0); });
+      return;
+    }
+  }
+  ttsSay(fallback);
+}
+function warmVoices(){
+  if(!VM || !VM[S.lang]) return;
+  const lang = S.lang;
+  const keys = Object.keys(VM[lang]).filter(k=>VM[lang][k]!=="" && (!/^n_\d+$/.test(k) || +k.slice(2) <= 40));
+  let i = 0;
+  const next = ()=>{ if(i >= keys.length || lang !== S.lang) return; const k = keys[i++]; fetch(VOICE_BASE+lang+"/"+k+".mp3").catch(()=>{}).finally(()=>setTimeout(next, 60)); };
+  for(let j=0;j<3;j++) setTimeout(next, 1500 + j*200);
+}
+
+/* ---- family recordings (IndexedDB, on this device only) ---- */
+let famDB = null, famKeysCache = null;
+function famOpen(){
+  if(famDB) return famDB;
+  famDB = new Promise((res)=>{ try{ const r = indexedDB.open("dukkan", 1); r.onupgradeneeded = ()=>r.result.createObjectStore("voices"); r.onsuccess = ()=>res(r.result); r.onerror = ()=>res(null); }catch(e){ res(null); } });
+  return famDB;
+}
+async function famTx(mode, fn){ const db = await famOpen(); if(!db) return null; return new Promise((res)=>{ try{ const tx = db.transaction("voices", mode); const st = tx.objectStore("voices"); const rq = fn(st); rq.onsuccess = ()=>res(rq.result); rq.onerror = ()=>res(null); }catch(e){ res(null); } }); }
+async function famKeys(){ if(!famKeysCache){ famKeysCache = new Set((await famTx("readonly", st=>st.getAllKeys())) || []); } return famKeysCache; }
+async function famHasAny(lang, keys){ const k = await famKeys(); return keys.some(x=>k.has(lang+"/"+x)); }
+async function famGet(lang, key){ const k = await famKeys(); if(!k.has(lang+"/"+key)) return null; return famTx("readonly", st=>st.get(lang+"/"+key)); }
+async function famSet(lang, key, blob){ await famTx("readwrite", st=>st.put(blob, lang+"/"+key)); (await famKeys()).add(lang+"/"+key); bufCache.delete(lang+"/"+key); }
+async function famDel(lang, key){ await famTx("readwrite", st=>st.delete(lang+"/"+key)); (await famKeys()).delete(lang+"/"+key); bufCache.delete(lang+"/"+key); }
+const FAMILY_KEYS = ["welcome","paid_9001","paid_9002","bonus_9001","bonus_9002","healedPre","found","treasure","closed"];
+
+/* ================= 3D icons (Microsoft Fluent Emoji, MIT) with emoji fallback ================= */
+const FX = {"🍎": "e00.webp", "🍌": "e01.webp", "🍓": "e02.webp", "🍉": "e03.webp", "🥕": "e04.webp", "🥛": "e05.webp", "🧃": "e06.webp", "🍞": "e07.webp", "🧀": "e08.webp", "🥚": "e09.webp", "🍫": "e10.webp", "🍪": "e11.webp", "🍦": "e12.webp", "🍕": "e13.webp", "🧸": "e14.webp", "📚": "e15.webp", "🖍️": "e16.webp", "🎈": "e17.webp", "🍯": "e18.webp", "🫒": "e19.webp", "🐰": "e20.webp", "🐱": "e21.webp", "🦄": "e23.webp", "🐼": "e24.webp", "🩹": "e25.webp", "🌡️": "e26.webp", "💧": "e27.webp", "🧣": "e28.webp", "📖": "e29.webp", "🍊": "e30.webp", "🤗": "e31.webp", "🥵": "e32.webp", "😷": "e34.webp", "🥱": "e35.webp", "😩": "e36.webp", "🤧": "e37.webp", "😢": "e38.webp", "🧊": "e39.webp", "🛏️": "e40.webp", "👟": "e41.webp", "🪴": "e42.webp", "🛋️": "e43.webp", "🪟": "e44.webp", "🫧": "e45.webp", "🍽️": "e46.webp", "🛒": "e47.webp", "🏥": "e48.webp", "🗺️": "e49.webp", "💎": "e50.webp", "⭐": "e51.webp", "🔍": "e52.webp", "🎯": "e53.webp", "🧹": "e54.webp", "↩️": "e55.webp", "💵": "e56.webp", "💳": "e57.webp", "🏦": "e58.webp", "🧾": "e60.webp", "🩺": "e61.webp", "🎁": "e62.webp", "🧭": "e63.webp", "🌙": "e64.webp", "🧺": "e65.webp", "🩷": "e66.webp", "✨": "e67.webp", "❔": "e68.webp", "🥳": "e69.webp", "🎉": "e70.webp", "👀": "e71.webp", "💡": "e72.webp", "🌟": "e73.webp", "🎙️": "e74.webp", "🔒": "e75.webp", "🗝️": "e76.webp", "🦖": "x74.webp", "🤕": "x75.webp", "🙈": "x76.webp"};
+let FX_OK = true;
+const FX_RE = new RegExp("("+Object.keys(FX).sort((a,b)=>b.length-a.length).map(e=>e.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|")+")\\uFE0F?", "g");
+function fx(html){ return FX_OK ? String(html).replace(FX_RE, m=>{ const k = FX[m] ? m : m.replace(/️$/,""); return FX[k] ? '<img class="fx" src="fx/'+FX[k]+'" alt="'+k+'" data-e="'+k+'" draggable="false">' : m; }) : html; }
+document.addEventListener("error", e=>{ const t = e.target; if(t && t.tagName==="IMG" && t.dataset && t.dataset.e){ FX_OK = false; t.replaceWith(document.createTextNode(t.dataset.e)); } }, true);
+function buzz(p){ try{ navigator.vibrate && navigator.vibrate(p); }catch(e){} }
 
 /* ================= Stage views ================= */
 function view(fn, cls){ lastView = fn; drawView(cls===undefined ? "pop" : cls); }
 function drawView(cls){
   const el = $("stage"); el.className = "stage-inner"; void el.offsetWidth;
   if(cls) el.classList.add(...cls.split(" "));
-  el.innerHTML = lastView();
+  el.innerHTML = fx(lastView());
 }
 const V = {
   idle: ()=>'<div class="big-emoji">🛒</div><p class="hint">'+T().idle+'</p><div class="choice"><button class="pill" type="button" data-act="mission">'+T().missionStart+'</button></div>',
@@ -647,7 +742,10 @@ const V = {
   huntDone: ()=>'<div class="big-emoji">💎</div><p class="big-name">'+T().treasure.treasure+'</p><p class="hint">'+T().treasure.treasureText+'</p>'+
       '<div class="choice"><button class="pill" type="button" data-act="huntAgain">'+T().treasure.again+'</button></div>'
 };
-function err(titleFn, spoken){ SFX.error(); view(V.msg("🙈", titleFn), "err shake"); say(spoken); }
+const ERR_KEYS = ()=>{ const s=T().say; return [[s.payFirst,"payFirst"],[s.empty,"empty"],[s.cashStarted,"cashStarted"],[s.unknown,"unknown"],[s.needPatient,"needPatient"]]; };
+function err(titleFn, spoken, tokens){ SFX.error(); view(V.msg("🙈", titleFn), "err shake");
+  if(!tokens){ const hit = ERR_KEYS().find(([t])=>t===spoken); tokens = hit ? [hit[1]] : null; }
+  if(tokens) speak(tokens, spoken); else ttsSay(spoken); }
 function modeIdleView(){ return S.mode==="shop" ? V.idle : S.mode==="clinic" ? (clinic ? V.clinicCase : V.clinicIdle) : (hunt && !hunt.done ? V.huntClue : hunt && hunt.done ? V.huntDone : V.huntSetup); }
 
 /* ================= Rendering ================= */
@@ -663,9 +761,9 @@ function applyLang(){
   $("startTitle").textContent = t.startTitle; $("startText").textContent = t.startText; $("startBtn").textContent = t.startBtn; $("startNote").textContent = t.startNote;
   $("closedTitle").textContent = t.closedTitle; $("closedText").textContent = t.closedText;
   [["fsBtn",t.fs],["gearBtn",t.gear],["closedGear",t.gear]].forEach(([id,l])=>{ $(id).setAttribute("aria-label",l); $(id).title=l; });
-  $("langsTop").innerHTML = langButtons(); $("langsStart").innerHTML = langButtons(); $("modes").innerHTML = modeButtons();
+  $("langsTop").innerHTML = langButtons(); $("langsStart").innerHTML = langButtons(); $("modes").innerHTML = fx(modeButtons());
   render(); if(lastView) drawView(""); if(!$("panelOv").hidden) renderPanel();
-  if(!$("recOv").hidden && lastTicket){ $("recSheet").innerHTML = lastTicket() + ticketBtn(); bindTicket(); }
+  if(!$("recOv").hidden && lastTicket){ $("recSheet").innerHTML = fx(lastTicket()) + ticketBtn(); bindTicket(); }
 }
 function render(){
   const t = T();
@@ -705,24 +803,24 @@ function renderSide(){
     }
     const items = !cart.length ? '<li class="empty"><span class="ee">🧾</span><b>'+t.emptyBill+'</b><span>'+t.emptyBillHint+'</span></li>'
       : cart.map((c,i)=>'<li class="'+(i===cart.length-1?"new":"")+'"><span class="e">'+PRODUCTS[c][0]+'</span><span class="n">'+esc(pname(c))+'</span><span class="p star">'+PRODUCTS[c][1]+'</span></li>').join("");
-    side.innerHTML = '<div class="rhead"><h2>'+t.receipt+'</h2><span class="rno">#'+String(S.receiptNo).padStart(4,"0")+'</span></div>'+
+    side.innerHTML = fx('<div class="rhead"><h2>'+t.receipt+'</h2><span class="rno">#'+String(S.receiptNo).padStart(4,"0")+'</span></div>'+
       '<div class="rsub">'+(cart.length?t.items(cart.length):"")+'</div>'+m+'<ul class="items" id="items">'+items+'</ul>'+
-      '<div class="sum"><span>'+t.sum+'</span><span>'+t.stars(total())+'</span></div>';
+      '<div class="sum"><span>'+t.sum+'</span><span>'+t.stars(total())+'</span></div>');
     const it = $("items"); it.scrollTop = it.scrollHeight;
   }else if(S.mode==="clinic"){
     const list = Object.keys(PATIENTS).map(c=>{
       const n = S.healed[c]||0, now = clinic && clinic.patient===c;
       return '<li class="'+(now?"new":"")+'"><span class="e">'+PATIENTS[c][0]+'</span><span class="n">'+esc(patName(c))+'</span><span class="p">'+(n?t.clinic.sticker(n):"–")+'</span></li>';
     }).join("");
-    side.innerHTML = '<div class="rhead"><h2>'+t.clinic.side+'</h2><span class="rno">🩺</span></div><div class="rsub"></div><ul class="items">'+list+'</ul>'+
-      '<div class="sum"><span>'+t.clinic.healedToday+'</span><span>'+Object.values(S.healed).reduce((a,b)=>a+b,0)+' 🩷</span></div>';
+    side.innerHTML = fx('<div class="rhead"><h2>'+t.clinic.side+'</h2><span class="rno">🩺</span></div><div class="rsub"></div><ul class="items">'+list+'</ul>'+
+      '<div class="sum"><span>'+t.clinic.healedToday+'</span><span>'+Object.values(S.healed).reduce((a,b)=>a+b,0)+' 🩷</span></div>');
   }else{
     const rows = hunt ? hunt.route.map((c,i)=>{
       const found = i < hunt.idx || hunt.done;
       return '<li class="'+(i===hunt.idx && !hunt.done?"new":"")+'"><span class="e">'+(found?SPOTS[c][0]:"❔")+'</span><span class="n">'+(found?esc(spotName(c)):t.treasure.clue+" "+(i+1))+'</span><span class="p">'+(found?"✓":"")+'</span></li>';
     }).join("") + '<li><span class="e">'+(hunt.done?"💎":"🎁")+'</span><span class="n">'+t.treasure.treasure+'</span><span class="p"></span></li>'
       : '<li class="empty"><span class="ee">🗺️</span><span>'+t.treasure.idleSide+'</span></li>';
-    side.innerHTML = '<div class="rhead"><h2>'+t.treasure.side+'</h2><span class="rno">🧭</span></div><div class="rsub"></div><ul class="items">'+rows+'</ul>';
+    side.innerHTML = fx('<div class="rhead"><h2>'+t.treasure.side+'</h2><span class="rno">🧭</span></div><div class="rsub"></div><ul class="items">'+rows+'</ul>');
   }
 }
 function txLabel(h){ const t=T(); return h.what==="bonus"?t.txBonus : h.what==="cash"?t.txCash : h.what==="mission"?t.txMission : t.items(h.n||0); }
@@ -739,7 +837,7 @@ let lastTicket = null;
 const ticketBtn = () => '<button class="cta" id="recOk" type="button">'+T().newBill+'</button>';
 function bindTicket(){ const b=$("recOk"); if(b) b.onclick = closeTicket; }
 function openTicket(fn){
-  lastTicket = fn; $("recSheet").innerHTML = fn() + ticketBtn(); $("recOv").hidden = false; bindTicket();
+  lastTicket = fn; $("recSheet").innerHTML = fx(fn()) + ticketBtn(); $("recOv").hidden = false; bindTicket();
   clearTimeout(receiptTimer); receiptTimer = setTimeout(closeTicket, 10000);
 }
 function closeTicket(){
@@ -749,24 +847,24 @@ function closeTicket(){
 const ticketLines = snap => snap.map(c=>'<div><span>'+PRODUCTS[c][0]+' '+esc(pname(c))+'</span><span>'+PRODUCTS[c][1]+' ★</span></div>').join("");
 
 /* ================= Modes ================= */
-function setMode(m, speak){
+function setMode(m, talk){
   if(!["shop","clinic","treasure"].includes(m)) return;
   if(!$("recOv").hidden) closeTicket();
   S.mode = m; save(); pending = null;
-  $("modes").innerHTML = modeButtons(); render(); view(modeIdleView());
-  SFX.soft(); if(speak!==false) say(T().say.mode[m]);
+  $("modes").innerHTML = fx(modeButtons()); render(); view(modeIdleView());
+  SFX.soft(); if(talk!==false) speak(["mode_"+m], T().say.mode[m]);
 }
 function newMission(){
   const codes = shuffle(Object.keys(PRODUCTS).filter(c=>PRODUCTS[c][1]<=6)).slice(0,3);
   mission = {items:codes, got:cart.filter(c=>codes.includes(c))};
   SFX.ding(); render();
   view(V.msg("🎯", ()=>T().missionTitle, ()=>mission.items.map(c=>PRODUCTS[c][0]+" "+esc(pname(c))).join(" · ")));
-  say(T().say.mission(mission.items.map(c=>pname(c)).join("، ")));
+  speak(["missionIntro"].concat(mission.items.map(c=>"p_"+c)), T().say.mission(mission.items.map(c=>pname(c)).join("، ")));
 }
 function startHunt(){
   const n = Math.min(S.clues||5, Object.keys(SPOTS).length);
   hunt = {route: shuffle(Object.keys(SPOTS)).slice(0,n), idx:0, hint:false, parents:false, done:false};
-  SFX.ding(); render(); view(V.huntClue); say(riddle(hunt.route[0]));
+  SFX.ding(); render(); view(V.huntClue); speak(["clue_"+hunt.route[0]], riddle(hunt.route[0]));
 }
 
 /* ================= Scan handling ================= */
@@ -802,8 +900,8 @@ function handleShop(code, act){
       mission.got.push(code); missionJustDone = mission.items.every(c=>mission.got.includes(c));
     }
     SFX.beep(); render(); view(V.product(code));
-    if(missionJustDone){ setTimeout(()=>{ SFX.ding(); say(T().say.missionDone); }, 900); }
-    say(T().say.product(pname(code), PRODUCTS[code][1]));
+    if(missionJustDone){ setTimeout(()=>{ SFX.ding(); speak(["missionDone"], T().say.missionDone); }, 1500); }
+    speak(["p_"+code, "n_"+PRODUCTS[code][1]], T().say.product(pname(code), PRODUCTS[code][1]));
     return;
   }
   if(BILLS[code]){
@@ -817,10 +915,10 @@ function handleShop(code, act){
         '<div class="rlines">'+ticketLines(snap)+'<div class="strong"><span>'+T().sum+'</span><span>'+sumV+' ★</span></div>'+
         '<div><span>'+T().received+'</span><span>'+got+' ★</span></div><div class="strong"><span>'+T().change+'</span><span>'+change+' ★</span></div></div>'+
         '<p class="change">'+(change>0 ? T().giveChange(T().stars(change)) : T().exact)+'</p>');
-      say(T().say.cashDone(change));
+      speak(change>0 ? ["thanksChange","n_"+change] : ["thanksExact"], T().say.cashDone(change));
     }else{
       render(); view(V.msg("💵", ()=>T().recv(v), ()=>T().left(total()-cash)));
-      say(T().say.recv(v, sumV-cash));
+      speak(["recv","n_"+v,"remaining","n_"+(sumV-cash),"toGo"], T().say.recv(v, sumV-cash));
     }
     return;
   }
@@ -828,18 +926,18 @@ function handleShop(code, act){
     const nm = kname(code);
     if(pending && pending.type==="bonus"){
       pending=null; S.balances[code]+=BONUS; log(code, BONUS, "bonus"); save(); render(); flashCard(code); SFX.kaching(); confetti();
-      view(V.msg("⭐", ()=>T().bonusFor(esc(kname(code))), null, ()=>"+"+BONUS)); say(T().say.bonus(nm));
+      view(V.msg("⭐", ()=>T().bonusFor(esc(kname(code))), null, ()=>"+"+BONUS)); speak(["bonus_"+code], T().say.bonus(nm));
       return;
     }
     if((pending && pending.type==="balance") || !cart.length){
       pending=null; render(); flashCard(code); SFX.soft();
-      view(V.msg("🏦", ()=>T().balanceOf(esc(kname(code))), null, ()=>S.balances[code])); say(T().say.balance(nm, S.balances[code]));
+      view(V.msg("🏦", ()=>T().balanceOf(esc(kname(code))), null, ()=>S.balances[code])); speak(["bal_"+code, "n_"+S.balances[code]], T().say.balance(nm, S.balances[code]));
       return;
     }
     if(ticketOpen) return;
     if(cash>0){ err(()=>T().cashStarted, T().say.cashStarted); return; }
     const sumV = total(), bal = S.balances[code];
-    if(bal < sumV){ flashCard(code); err(()=>T().notEnough(esc(kname(code)), sumV-bal), T().say.notEnough(nm, sumV-bal)); return; }
+    if(bal < sumV){ flashCard(code); err(()=>T().notEnough(esc(kname(code)), sumV-bal), T().say.notEnough(nm, sumV-bal), ["ne_"+code, "n_"+(sumV-bal), "more"]); return; }
     const missionOk = mission && mission.items.every(c=>mission.got.includes(c));
     S.balances[code] = bal - sumV; log(code, -sumV, "items", cart.length);
     if(missionOk){ S.balances[code] += MISSION_BONUS; log(code, MISSION_BONUS, "mission"); mission = null; }
@@ -849,26 +947,26 @@ function handleShop(code, act){
       '<div class="rlines">'+ticketLines(snap)+'<div class="strong"><span>'+T().sum+'</span><span>'+sumV+' ★</span></div>'+
       (missionOk?'<div><span>🎯 '+T().missionBonus+'</span><span>+'+MISSION_BONUS+' ★</span></div>':'')+
       '<div><span>'+T().before+'</span><span>'+bal+' ★</span></div><div class="strong"><span>'+T().after+'</span><span>'+now+' ★</span></div></div>');
-    say(T().say.paid(nm, now));
+    speak(["paid_"+code, "balanceNow", "n_"+now], T().say.paid(nm, now));
     return;
   }
   if(act==="undo"){
     if(cash>0){ err(()=>T().noUndoPaying, T().noUndoPaying); return; }
     const r = cart.pop(); if(!r){ err(()=>T().nothingToUndo, T().nothingToUndo); return; }
     if(mission && !cart.includes(r)) mission.got = mission.got.filter(c=>c!==r);
-    SFX.soft(); render(); view(V.msg("↩️", ()=>T().removed(esc(pname(r))))); say(T().say.removed(pname(r)));
+    SFX.soft(); render(); view(V.msg("↩️", ()=>T().removed(esc(pname(r))))); speak(["removed","p_"+r], T().say.removed(pname(r)));
     return;
   }
   if(act==="clear"){
     if(ticketOpen){ closeTicket(); } else { cart=[]; cash=0; if(mission) mission.got=[]; }
-    pending=null; SFX.soft(); render(); view(V.idle); say(T().say.newBill);
+    pending=null; SFX.soft(); render(); view(V.idle); speak(["newBill"], T().say.newBill);
     return;
   }
   if(act==="mission"){ if(ticketOpen) closeTicket(); newMission(); return; }
   if(act==="bonus" || act==="balance"){
     pending = {type:act, until:Date.now()+15000}; SFX.soft(); render();
     view(V.msg(act==="bonus"?"⭐":"🔍", ()=>act==="bonus"?T().bonusTitle:T().balanceTitle, ()=>T().scanCard));
-    say(act==="bonus"?T().say.pendBonus:T().say.pendBalance);
+    speak([act==="bonus"?"pendBonus":"pendBalance"], act==="bonus"?T().say.pendBonus:T().say.pendBalance);
     return;
   }
   err(()=>T().unknown(code), T().say.unknown);
@@ -881,7 +979,7 @@ function handleClinic(code, act){
     const ail = shuffle(AILMENTS.filter(a=>a!==prev))[0];
     clinic = {patient:code, ail, got:[], wrong:0, hint:false};
     SFX.ding(); render(); view(V.clinicCase);
-    say(T().say.patient(patName(code), ailName(ail)));
+    speak(["pat_"+code, "diag", "ail_"+AILMENTS.indexOf(ail), "whatNeeds"], T().say.patient(patName(code), ailName(ail)));
     return;
   }
   if(MEDS[code]){
@@ -891,11 +989,11 @@ function handleClinic(code, act){
       clinic.got.push(code);
       if(clinic.ail.need.every(m=>clinic.got.includes(m))){
         const p = clinic.patient; S.healed[p] = (S.healed[p]||0)+1; S.healedDay = today(); save(); clinic = null;
-        SFX.heal(); confetti(["#FF8FB8","#FFB627","#1FC3A4","#FFFFFF","#F0374F"]); render(); view(V.clinicHealed(p)); say(T().say.healed(patName(p)));
-      }else{ SFX.ding(); render(); view(V.clinicCase); say(T().say.correct(medName(code))); }
+        SFX.heal(); confetti(["#FF8FB8","#FFB627","#1FC3A4","#FFFFFF","#F0374F"]); render(); view(V.clinicHealed(p)); speak(["healedPre","pat_"+p,"healedPost"], T().say.healed(patName(p)));
+      }else{ SFX.ding(); render(); view(V.clinicCase); speak(["med_"+code,"correct"], T().say.correct(medName(code))); }
     }else{
       clinic.wrong++; if(clinic.wrong>=2) clinic.hint = true;
-      SFX.error(); toast(t.wrong(MEDS[code][0]+" "+medName(code), ailName(clinic.ail))); view(V.clinicCase, "shake"); say(T().say.wrong);
+      SFX.error(); toast(t.wrong(MEDS[code][0]+" "+medName(code), ailName(clinic.ail))); view(V.clinicCase, "shake"); speak(["wrong"], T().say.wrong);
     }
     return;
   }
@@ -912,14 +1010,14 @@ function handleTreasure(code, act){
     if(code === hunt.route[hunt.idx]){
       hunt.idx++; hunt.hint = false;
       if(hunt.idx >= hunt.route.length){
-        hunt.done = true; SFX.fanfare(); confetti(); confetti(); render(); view(V.huntDone); say(T().say.treasure);
+        hunt.done = true; SFX.fanfare(); confetti(); confetti(); render(); view(V.huntDone); speak(["treasure"], T().say.treasure);
       }else{
         SFX.ding(); render(); view(V.huntFound(code));
-        say(T().say.found+" "+riddle(hunt.route[hunt.idx]));
+        speak(["found","clue_"+hunt.route[hunt.idx]], T().say.found+" "+riddle(hunt.route[hunt.idx]));
         setTimeout(()=>{ if(hunt && !hunt.done && S.mode==="treasure") view(V.huntClue); }, 2200);
       }
     }else{
-      SFX.error(); toast(t.notHere); view(V.huntClue, "shake"); say(T().say.notHere);
+      SFX.error(); toast(t.notHere); view(V.huntClue, "shake"); speak(["notHere"], T().say.notHere);
     }
     return;
   }
@@ -959,22 +1057,22 @@ document.addEventListener("keydown", e=>{
 });
 
 /* ================= Confetti (stars + ribbons) ================= */
-const fx = $("fx"), ctx = fx.getContext("2d"); let parts=[], raf=null;
+const fxc = $("fx"), ctx = fxc.getContext("2d"); let parts=[], raf=null;
 function confetti(colors){
   if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  const d = devicePixelRatio||1; fx.width = innerWidth*d; fx.height = innerHeight*d;
+  const d = devicePixelRatio||1; fxc.width = innerWidth*d; fxc.height = innerHeight*d;
   const cols = colors || ["#F0374F","#FFB627","#8E4DFF","#1FC3A4","#4BA3FF","#E0479E","#FFFFFF"];
-  for(let i=0;i<170;i++) parts.push({x:fx.width*(.3+Math.random()*.4), y:fx.height*.5, vx:(Math.random()-.5)*28*d, vy:(-Math.random()*24-9)*d,
+  for(let i=0;i<170;i++) parts.push({x:fxc.width*(.3+Math.random()*.4), y:fxc.height*.5, vx:(Math.random()-.5)*28*d, vy:(-Math.random()*24-9)*d,
     r:(Math.random()*7+5)*d, c:cols[i%cols.length], a:Math.random()*6, s:Math.random()<.3, life:0});
   if(!raf) tick();
 }
 function star(r){ ctx.beginPath(); for(let i=0;i<10;i++){ const rr = i%2? r*.45 : r; const a = i*Math.PI/5 - Math.PI/2; ctx.lineTo(Math.cos(a)*rr, Math.sin(a)*rr); } ctx.closePath(); ctx.fill(); }
 function tick(){
-  const d = devicePixelRatio||1; ctx.clearRect(0,0,fx.width,fx.height);
+  const d = devicePixelRatio||1; ctx.clearRect(0,0,fxc.width,fxc.height);
   parts.forEach(p=>{ p.vy += .9*d; p.vx *= .985; p.x += p.vx; p.y += p.vy; p.a += .18; p.life++;
     ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=p.c; if(p.s) star(p.r*.9); else ctx.fillRect(-p.r/2,-p.r/4,p.r,p.r/2); ctx.restore(); });
-  parts = parts.filter(p=>p.y < fx.height+50 && p.life < 260);
-  raf = parts.length ? requestAnimationFrame(tick) : (ctx.clearRect(0,0,fx.width,fx.height), null);
+  parts = parts.filter(p=>p.y < fxc.height+50 && p.life < 260);
+  raf = parts.length ? requestAnimationFrame(tick) : (ctx.clearRect(0,0,fxc.width,fxc.height), null);
 }
 
 /* ================= Start, wake lock, full screen, closing time ================= */
@@ -983,13 +1081,13 @@ async function keepAwake(){ try{ if("wakeLock" in navigator) wake = await naviga
 document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible" && $("startOv").hidden) keepAwake(); });
 function startGame(){
   if($("startOv").hidden) return;
-  $("startOv").hidden = true; audio(); SFX.soft(); keepAwake(); sessionStart = Date.now(); say(T().say.welcome);
+  $("startOv").hidden = true; audio(); SFX.soft(); keepAwake(); sessionStart = Date.now(); speak(["welcome"], T().say.welcome); warmVoices();
   if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
 }
 function checkClosing(){
   if(!S.limit || !sessionStart || closed) return;
   if(Date.now() - sessionStart >= S.limit*60000){
-    closed = true; $("recOv").hidden = true; $("closedOv").hidden = false; SFX.soft(); say(T().say.closed);
+    closed = true; $("recOv").hidden = true; $("closedOv").hidden = false; SFX.soft(); speak(["closed"], T().say.closed);
   }
 }
 setInterval(checkClosing, 10000);
@@ -1001,7 +1099,7 @@ $("fsBtn").onclick = async ()=>{
 };
 document.addEventListener("click", e=>{
   const lb = e.target.closest && e.target.closest("[data-lang]");
-  if(lb){ S.lang = lb.dataset.lang; save(); applyLang(); if($("startOv").hidden){ audio(); SFX.soft(); } return; }
+  if(lb){ S.lang = lb.dataset.lang; save(); applyLang(); if($("startOv").hidden){ audio(); SFX.soft(); warmVoices(); } return; }
   const mb = e.target.closest && e.target.closest("[data-mode]");
   if(mb){ audio(); setMode(mb.dataset.mode); mb.blur && mb.blur(); }
 });
@@ -1009,6 +1107,7 @@ document.addEventListener("click", e=>{
 /* ================= Parent panel ================= */
 function renderVoiceInfo(){
   const el = $("voiceInfo"); if(!el) return; const t = T();
+  if(VM && VM[S.lang]){ el.textContent = t.voiceHuman(Object.values(VM[S.lang]).filter(Boolean).length); return; }
   if(!("speechSynthesis" in window)){ el.textContent = t.noTTS; return; }
   const v = voiceFor(S.lang); el.textContent = v ? t.voiceUsing(v.name) : t.noVoice;
 }
@@ -1022,7 +1121,7 @@ function renderPanel(){
   $("limitSel").innerHTML = [0,15,30,45,60].map(n=>'<option value="'+n+'"'+(S.limit===n?" selected":"")+'>'+(n?t.limitMin(n):t.limitOff)+'</option>').join("");
   $("timeInfo").textContent = S.limit && sessionStart ? t.timeLeft(Math.max(0, Math.ceil((S.limit*60000-(Date.now()-sessionStart))/60000))) : t.timeOff;
   $("voiceBtn").textContent = S.voice ? t.voiceOn : t.voiceOff; $("sfxBtn").textContent = S.sfx ? t.sfxOn : t.sfxOff;
-  renderVoiceInfo();
+  renderVoiceInfo(); renderFamily();
   $("ctrlList").innerHTML = Object.entries(CTRL).map(([c,a])=>'<b>'+c+'</b><span>'+t.ctrl[a]+'</span>').join("")+
     '<b>9001 / 9002</b><span>'+t.rows.cards+'</span><b>7001–7020</b><span>'+t.rows.bills+'</span><b>1001–1020</b><span>'+t.rows.prod+'</span>'+
     '<b>3001–3006</b><span>'+t.rows.pat+'</span><b>4001–4008</b><span>'+t.rows.med+'</span><b>5001–5010</b><span>'+t.rows.spot+'</span>';
@@ -1035,7 +1134,50 @@ function renderPanel(){
 $("quickCodes").innerHTML = ["1001","1011","9001","7005","8030","3001","4002","4004","5001"].map(c=>'<button class="ghost" type="button" data-code="'+c+'">'+c+'</button>').join("");
 $("quickCodes").addEventListener("click", e=>{ const c = e.target.dataset && e.target.dataset.code; if(c){ closePanel(); if(!$("startOv").hidden) startGame(); handle(c); } });
 function openPanel(){ renderPanel(); $("panelOv").hidden = false; }
-$("gearBtn").onclick = openPanel; $("closedGear").onclick = openPanel;
+function holdToOpen(btn, wrap){
+  let timer = null, opened = false;
+  const start = e=>{ if(e.button>0) return; opened = false; wrap.classList.add("holding"); timer = setTimeout(()=>{ opened = true; wrap.classList.remove("holding"); buzz(25); openPanel(); }, 1100); };
+  const stop = ()=>{ clearTimeout(timer); wrap.classList.remove("holding"); };
+  btn.addEventListener("pointerdown", start); ["pointerup","pointerleave","pointercancel"].forEach(ev=>btn.addEventListener(ev, stop));
+  btn.addEventListener("contextmenu", e=>e.preventDefault());
+  btn.addEventListener("click", e=>{ if(e.detail===0){ openPanel(); return; } if(!opened) toast(T().holdHint); });
+}
+holdToOpen($("gearBtn"), $("gearWrap")); holdToOpen($("closedGear"), $("closedWrap"));
+
+/* family voice recorder */
+let recState = null;   // {key, rec, chunks, stream}
+async function renderFamily(){
+  const t = T(), list = $("famList"), lang = S.lang;
+  $("pFamily").textContent = t.pFamily;
+  const micOk = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+  $("famInfo").textContent = micOk ? t.famInfo : t.micNo;
+  if(!micOk){ list.innerHTML = ""; return; }
+  const have = await famKeys();
+  list.innerHTML = FAMILY_KEYS.map(k=>{
+    const txt = (VM && VM[lang] && VM[lang][k]) || k, has = have.has(lang+"/"+k), on = recState && recState.key===k;
+    return '<div class="famrow"><div class="ft">'+esc(txt)+(has?'<small>'+t.famHas+'</small>':'')+'</div><div class="fb">'+
+      '<button class="ghost rec'+(on?' on':'')+'" type="button" data-fam="rec" data-k="'+k+'">'+(on?t.famStop:t.famRec)+'</button>'+
+      '<button class="ghost" type="button" data-fam="play" data-k="'+k+'" aria-label="play">'+t.famPlay+'</button>'+
+      (has?'<button class="ghost danger" type="button" data-fam="del" data-k="'+k+'" aria-label="delete">'+t.famDel+'</button>':'')+'</div></div>';
+  }).join("");
+}
+$("famList").addEventListener("click", async e=>{
+  const b = e.target.closest("[data-fam]"); if(!b) return;
+  const k = b.dataset.k, act = b.dataset.fam, lang = S.lang; audio();
+  if(act==="play"){ speak([k], (VM && VM[lang] && VM[lang][k]) || ""); return; }
+  if(act==="del"){ await famDel(lang, k); renderFamily(); return; }
+  if(recState && recState.key===k){ recState.rec.stop(); return; }
+  if(recState) return;
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true, noiseSuppression:true}});
+    const rec = new MediaRecorder(stream); const chunks = [];
+    rec.ondataavailable = ev=>{ if(ev.data.size) chunks.push(ev.data); };
+    rec.onstop = async ()=>{ stream.getTracks().forEach(tr=>tr.stop()); const blob = new Blob(chunks, {type: rec.mimeType || "audio/webm"});
+      recState = null; if(blob.size > 1500) await famSet(lang, k, blob); renderFamily(); };
+    recState = {key:k, rec}; rec.start(); renderFamily();
+    setTimeout(()=>{ if(recState && recState.rec===rec) rec.stop(); }, 8000);
+  }catch(err){ recState = null; toast(T().micNo); renderFamily(); }
+});
 function closePanel(){ $("panelOv").hidden = true; if(document.activeElement && document.activeElement.blur) document.activeElement.blur(); }
 $("closePanel").onclick = closePanel;
 $("manualBtn").onclick = ()=>{ const v = $("manualCode").value; $("manualCode").value = ""; closePanel(); if(!$("startOv").hidden) startGame(); handle(v); };
@@ -1062,7 +1204,11 @@ function resetUI(confirming){
 }
 
 /* ================= Boot ================= */
+document.querySelectorAll(".welcome .big-emoji, .moon, .sign .logo").forEach(el=>{ el.innerHTML = fx(el.innerHTML); });
 lastView = modeIdleView(); applyLang(); drawView("");
+if("serviceWorker" in navigator && location.protocol==="https:" && /github\.io$/.test(location.hostname)){
+  navigator.serviceWorker.register("sw.js").catch(()=>{});
+}
 </script>
 
 </body>
