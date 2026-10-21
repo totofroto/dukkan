@@ -40,6 +40,7 @@
 }
 :root[lang="en"],:root[lang="de"]{--display:var(--display-lat)}
 body[data-mode="clinic"]{--mode:var(--mint);--mode-deep:var(--mint-deep);--mode-soft:#DDF8F1;--burst:#C9F5EA}
+body[data-mode="detective"]{--mode:#8E4DFF;--mode-deep:#5B23C2;--mode-soft:#EFE6FF;--burst:#E3D5FF}
 body[data-mode="treasure"]{--mode:var(--sky);--mode-deep:var(--sky-deep);--mode-soft:#DCEBFF;--burst:#FFE29A}
 html,body{height:100%}
 body{margin:0;color:var(--ink);font-family:var(--body);font-size:16px;overflow:hidden;
@@ -232,6 +233,48 @@ img.fx{width:1em;height:1em;object-fit:contain;vertical-align:-.14em;display:inl
 .said{animation:said .45s ease-out}
 @keyframes said{40%{transform:scale(1.06)}}
 .tapw{display:contents}
+/* ---- food detective ---- */
+.det{width:min(100%,760px);display:grid;gap:12px;text-align:start;justify-items:stretch}
+.det-top{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center}
+.det-img{width:clamp(96px,16vw,150px);aspect-ratio:1;border-radius:22px;background:#fff;display:grid;place-items:center;overflow:hidden;box-shadow:0 8px 24px #2A1B4A22;font-size:4rem}
+.det-img img{width:100%;height:100%;object-fit:contain}
+.det-id .big-name{font-size:clamp(1.4rem,3.4vw,2.2rem);text-align:start}
+.det-id .hint{max-width:none;font-size:.95rem}
+.verdict{display:inline-flex;align-items:center;gap:10px;border-radius:999px;padding:8px 18px;font-family:var(--display);font-weight:800;font-size:clamp(1.1rem,2.6vw,1.5rem);margin-top:6px;color:#fff}
+.v-green{background:#1E9E5A;box-shadow:0 4px 0 #11713E} .v-yellow{background:#F2A900;box-shadow:0 4px 0 #B87F00;color:#2A1B4A} .v-red{background:#E63E3E;box-shadow:0 4px 0 #A92525} .v-unknown{background:#9A8DB8;box-shadow:0 4px 0 #6B5A8E}
+.guess{background:var(--mode-soft);border-radius:20px;padding:14px;text-align:center;display:grid;gap:8px}
+.guess .q{font-family:var(--display);font-weight:800;font-size:clamp(1.15rem,2.8vw,1.6rem);margin:0}
+.guess .pill{min-width:76px;font-size:1.35rem}
+.cubes{background:#fff;border:2px dashed var(--line);border-radius:20px;padding:12px 14px;display:grid;gap:8px}
+.cubes .lbl{font-weight:700;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.cubes .row{display:flex;flex-wrap:wrap;gap:5px;direction:ltr}
+.cube{width:22px;height:22px;border-radius:5px;background:linear-gradient(135deg,#fff 0%,#F3EEFF 55%,#D9CFF2 100%);box-shadow:inset 0 0 0 1.5px #CFC2EE,0 2px 0 #CFC2EE;animation:drop .35s backwards}
+@keyframes drop{from{transform:translateY(-14px);opacity:0}}
+.more{font-weight:800;color:var(--ink-soft);align-self:center}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.fact{background:#fff;border-radius:18px;padding:10px 12px;box-shadow:0 3px 0 var(--line);display:grid;gap:6px;align-content:start}
+.fact h5{margin:0;font-size:.85rem;color:var(--ink-soft);font-weight:600}
+.ns{display:flex;gap:3px;direction:ltr}
+.ns span{flex:1;text-align:center;border-radius:6px;font-weight:800;color:#fff;padding:3px 0;opacity:.35;font-family:var(--display-lat)}
+.ns span.on{opacity:1;transform:scale(1.18);box-shadow:0 3px 8px #0003}
+.ns .a{background:#038141}.ns .b{background:#85BB2F}.ns .c{background:#FECB02;color:#2A1B4A}.ns .d{background:#EE8100}.ns .e{background:#E63E11}
+.nova{display:flex;gap:4px;direction:ltr}.nova i{flex:1;height:10px;border-radius:5px;background:var(--line)}
+.nova i.on{background:var(--mode)}
+.chips2{display:flex;flex-wrap:wrap;gap:6px}
+.chip2{border-radius:999px;padding:4px 10px;font-size:.88rem;background:var(--ground);display:inline-flex;gap:5px;align-items:center}
+.lv-low{background:#DDF5E7;color:#11713E}.lv-moderate{background:#FFF0C7;color:#7A5600}.lv-high{background:#FFE0E0;color:#A92525}
+.halal{border-radius:18px;padding:10px 12px;display:grid;gap:6px}
+.halal.ok{background:#E6F7EE}.halal.warn{background:#FFF1D6}.halal.info{background:var(--ground)}
+.ingr{background:#fff;border-radius:18px;padding:10px 14px;box-shadow:0 3px 0 var(--line)}
+.ingr summary{cursor:pointer;font-weight:700}
+.ingr p{line-height:1.7;font-size:.92rem;margin:8px 0 0}
+.addl{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:4px;font-size:.9rem}
+.addl b{direction:ltr;display:inline-block;min-width:4.2em}
+.src{font-size:.78rem;color:var(--ink-soft)}
+.rank{background:linear-gradient(120deg,var(--mode),var(--mode-deep));color:#fff;border-radius:16px;padding:10px 12px;margin-bottom:8px;display:grid;gap:6px}
+.rank .bar{height:8px;border-radius:4px;background:#ffffff40;overflow:hidden}.rank .bar i{display:block;height:100%;background:var(--saffron)}
+.win{background:#FFF6D6;border-radius:12px;padding:6px 10px;margin-bottom:8px;font-size:.92rem}
+@media (max-width:600px){ .det-top{grid-template-columns:1fr;justify-items:center;text-align:center} .det-id .big-name{text-align:center} }
 canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:25;width:100%;height:100%}
 
 @media (max-width:980px){ .modes button .ml{display:none} .modes button{padding:0 12px} }
@@ -336,6 +379,11 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:25;width:100%;heigh
       <div class="small" id="voiceInfo"></div>
     </section>
     <section>
+      <h4 id="pDet"></h4>
+      <label class="row"><input type="checkbox" id="guessChk" style="width:auto"> <span id="guessLbl"></span></label>
+      <label class="row"><input type="checkbox" id="halalChk" style="width:auto"> <span id="halalLbl"></span></label>
+    </section>
+    <section>
       <h4 id="pReal"></h4>
       <div class="small" id="realInfo"></div>
       <div id="realList"></div>
@@ -408,7 +456,7 @@ const SPOTS = {
 const LANG_IDX = {ar:0,en:1,de:2};
 const BILLS = {"7001":1,"7002":2,"7005":5,"7010":10,"7020":20};
 const KIDS = {"9001":{cls:"f",name:{ar:"فاطمة",en:"Fatima",de:"Fatima"}}, "9002":{cls:"s",name:{ar:"سماء",en:"Sama",de:"Sama"}}};
-const CTRL = {"8001":"undo","8002":"clear","8010":"bonus","8020":"balance","8030":"mission","8101":"m:shop","8102":"m:clinic","8103":"m:treasure"};
+const CTRL = {"8001":"undo","8002":"clear","8010":"bonus","8020":"balance","8030":"mission","8101":"m:shop","8102":"m:clinic","8103":"m:treasure","8104":"m:detective"};
 /* ================= Money =================
    Amounts are integers in the currency's smallest unit (cents for EUR/USD/GBP, whole units otherwise).
    Money cards: 7 · currency digit · value in hundredths (5 digits), e.g. 7101000 = 10 €, 7100050 = 0.50 €.
@@ -467,7 +515,7 @@ const KEY = "dukkan_fs_v3";
 const L = {
  ar:{
   dir:"rtl", label:"ع", voice:/^ar/i,
-  brand:"دكان فاطمة وسماء", modes:{shop:"الدكان",clinic:"العيادة",treasure:"الكنز"},
+  brand:"دكان فاطمة وسماء", modes:{shop:"الدكان",clinic:"العيادة",treasure:"الكنز",detective:"المحققة"},
   stars:n=> n===1?"نجمة واحدة": n===2?"نجمتان": (n>=3&&n<=10)? n+" نجوم" : n+" نجمة",
   items:n=> n===1?"منتج واحد": n===2?"منتجان": (n>=3&&n<=10)? n+" منتجات": n+" منتجاً",
   total:"المجموع", receipt:"الفاتورة", sum:"الإجمالي",
@@ -497,6 +545,20 @@ const L = {
         mission:"🎯 قائمة تسوق جديدة", "m:shop":"🛒 وضع الدكان", "m:clinic":"🏥 وضع العيادة", "m:treasure":"🗺️ وضع الكنز"},
   holdHint:"اضغط مطولاً على ⚙︎ لفتح لوحة الأهل", pFamily:"🎙️ صوت العائلة", famInfo:"سجّل بصوتك أو بصوت ماما. التسجيل يُحفظ على هذا الجهاز فقط ويحلّ محل الصوت الآلي.", famRec:"● سجّل", famStop:"■ أوقف", famPlay:"▶", famDel:"🗑", famHas:"✓ بصوت العائلة", micNo:"الميكروفون غير متاح هنا. افتح اللعبة من رابط GitHub على التابلت.", voiceHuman:n=>"🎧 أصوات بشرية جاهزة ("+n+" مقطعاً)",
   pMoney:"💶 العملة", simplePrices:"أسعار بسيطة بدون كسور (مناسبة لسماء)", rateNote:"أسعار صرف ثابتة للعب، وليست أسعار السوق.", pReal:"📦 المنتجات الحقيقية", realInfo:"امسحي باركود أي منتج من المطبخ: يُبحث عنه في Open Food Facts ويُضاف للدكان. يمكنك تعديل الاسم والسعر هنا.", noReal:"لا توجد منتجات حقيقية بعد. امسحي باركود علبة من المطبخ.", exportBtn:"⬇️ نسخة احتياطية", importBtn:"⬆️ استعادة", imported:n=>"تمت استعادة "+n+" منتج", searchingTxt:"لحظة، أبحث عن المنتج…", newProd:"منتج جديد!", notCurrency:c=>"هذه "+c+". عملة الدكان اليوم: "+CUR[S.currency].name.ar, currencySet:c=>"العملة الآن: "+c, delBtn:"🗑", moneyRow:"نقود حقيقية: 7 + رقم العملة + القيمة", realRow:"باركود أي منتج حقيقي",
+  det:{ idle:"امسحي باركود أي طعام من المطبخ، وسأكشف لك أسراره!", searching:"المحققة تفحص الملف…", notFound:"لم أجد هذا المنتج في قاعدة البيانات.", notFoundHint:"جرّبي منتجاً آخر، أو أضيفيه بنفسك على openfoodfacts.org",
+  guessQ:"🤔 خمّني: كم مكعب سكر في 100 غ؟", reveal:"اكشفي الجواب", right:"إجابة صحيحة! 🎉", close:n=>"قريب! الجواب: "+n,
+  sugarIn100:"في 100 غ", per:g=>"في الحصة ("+g+" غ)", cubesTxt:n=>n===0?"لا سكر تقريباً":(n===1?"مكعب سكر واحد":n===2?"مكعبا سكر":(n<=10?n+" مكعبات سكر":n+" مكعب سكر")), gSugar:g=>g+" غ سكر",
+  v:{green:"🟢 طعام لكل يوم", yellow:"🟡 طعام لبعض الأحيان", red:"🔴 للمناسبات فقط", unknown:"⚪ معلومات غير كافية"},
+  nutri:"التقييم الغذائي (Nutri-Score)", nova:"درجة التصنيع (NOVA)", novaTxt:["غير مصنّع","مكوّن طبخ","مصنّع","مصنّع جداً"],
+  levels:"في 100 غ", fat:"دهون", sat:"دهون مشبعة", sugars:"سكر", salt:"ملح", kcal:"سعرات",
+  lv:{low:"قليل", moderate:"متوسط", high:"كثير"}, allergens:"⚠️ مسببات الحساسية", traces:"قد يحتوي على آثار:", noAllergens:"لا توجد مسببات حساسية مسجلة",
+  diet:"🌱 النوع", vegan:"نباتي صرف", vegetarian:"نباتي", nonVegan:"فيه مكونات حيوانية", palm:"زيت النخيل", noPalm:"بدون زيت النخيل",
+  halalTitle:"🕌 فحص الحلال (للأهل)", halalLabel:"✓ عليه ملصق حلال", halalOk:"لم نجد مكونات مشبوهة في القائمة.", halalWarn:"راجعوا هذه المكونات:", halalNote:"فحص نصّي للمكونات فقط، وليس شهادة حلال.",
+  hf:{gel:"جيلاتين (قد يكون من الخنزير)", gelbeef:"جيلاتين بقري (تحقّقوا من الذبح)", pork:"منتجات خنزير", alc:"كحول", carmine:"صبغة كارمين (من حشرات)", cyst:"L-سيستين (قد يكون حيوانياً)"},
+  ingredients:"📋 المكونات", additives:"🧪 المضافات", noAdditives:"لا توجد مضافات مسجلة", noIngr:"المكونات غير متوفرة.",
+  toShop:"🛒 أضيفيه للدكان", more:"المصدر: Open Food Facts", side:"🗂️ ملف التحقيق", checked:"منتجات مفحوصة", empty:"لم تفحصي أي منتج بعد.",
+  rankNext:n=>"بقي "+n+" للّقب التالي", rankMax:"أعلى لقب! 👑", least:"🏆 الأقل سكراً:", levelUp:t=>"ترقية! لقبك: "+t,
+  lvl:["محققة جديدة","محققة مبتدئة","محققة ماهرة","محققة خبيرة","كبيرة المحققين"], guessToggle:"لعبة التخمين قبل الكشف", halalToggle:"إظهار فحص الحلال", pDet:"🔍 المحققة الغذائية" },
   pTitle:"لوحة الأهل", pTest:"تجربة بدون ماسح", scan:"امسح", pBal:"الأرصدة", saveBal:"حفظ الأرصدة", saved:"تم حفظ الأرصدة", badNum:"اكتب رقماً صحيحاً من 0 فما فوق",
   pTime:"وقت الإغلاق", limitOff:"بدون وقت محدد", limitMin:n=>"يغلق الدكان بعد "+n+" دقيقة", reopen:"افتح الدكان من جديد",
   timeLeft:n=>"باقي "+n+" دقيقة على الإغلاق", timeOff:"لا يوجد وقت إغلاق", reopened:"فُتح الدكان من جديد",
@@ -516,7 +578,7 @@ const L = {
    payFirst:"أكملي الدفع أولاً", cashStarted:"بدأنا الدفع نقداً، أكملي بالنقود",
    pendBonus:"امسحي بطاقة من تستحق المكافأة", pendBalance:"امسحي البطاقة", welcome:"أهلاً بكِ في دكان فاطمة وسماء",
    mission:l=>"قائمة التسوق: "+l, missionDone:"رائع! اكتملت القائمة",
-   mode:{shop:"الدكان مفتوح", clinic:"العيادة مفتوحة، أهلاً دكتورة", treasure:"مغامرة الكنز"},
+   mode:{shop:"الدكان مفتوح", clinic:"العيادة مفتوحة، أهلاً دكتورة", treasure:"مغامرة الكنز", detective:"وضع المحققة الغذائية"},
    patient:(n,a)=>n+". التشخيص: "+a+". ماذا يحتاج؟", correct:m=>m+"، صحيح!", wrong:"لا، جرّبي علاجاً آخر", healed:n=>"رائع! "+n+" شُفي تماماً",
    needPatient:"امسحي سوار المريض أولاً",
    clue:r=>r, found:"وجدتِها!", notHere:"ليس هنا", treasure:"وجدتِ الكنز! مبروك", closed:"الدكان مغلق الآن. نراكما غداً"
@@ -524,7 +586,7 @@ const L = {
  },
  en:{
   dir:"ltr", label:"EN", voice:/^en/i,
-  brand:"Fatima & Sama's Shop", modes:{shop:"Shop",clinic:"Clinic",treasure:"Treasure"},
+  brand:"Fatima & Sama's Shop", modes:{shop:"Shop",clinic:"Clinic",treasure:"Treasure",detective:"Detective"},
   stars:n=> n===1?"1 star": n+" stars", items:n=> n===1?"1 item": n+" items",
   total:"Total", receipt:"Receipt", sum:"Total",
   cashLine:(c,r)=>"Cash "+fmt(c)+" · "+fmt(r)+" to go",
@@ -553,6 +615,20 @@ const L = {
         mission:"🎯 New shopping list", "m:shop":"🛒 Shop mode", "m:clinic":"🏥 Clinic mode", "m:treasure":"🗺️ Treasure mode"},
   holdHint:"Press and hold ⚙︎ to open the parents' panel", pFamily:"🎙️ Family voice", famInfo:"Record these lines in your own voice. Recordings stay on this device and replace the built-in voice.", famRec:"● Record", famStop:"■ Stop", famPlay:"▶", famDel:"🗑", famHas:"✓ Family voice", micNo:"The microphone isn't available here. Open the game from its GitHub link on the tablet.", voiceHuman:n=>"🎧 Human voices ready ("+n+" clips)",
   pMoney:"💶 Currency", simplePrices:"Simple prices without cents (good for Sama)", rateNote:"Fixed play exchange rates, not market rates.", pReal:"📦 Real products", realInfo:"Scan the barcode of anything from the kitchen: it is looked up on Open Food Facts and added to the shop. Edit names and prices here.", noReal:"No real products yet. Scan a barcode from the kitchen.", exportBtn:"⬇️ Back up", importBtn:"⬆️ Restore", imported:n=>n+" products restored", searchingTxt:"One moment, looking this product up…", newProd:"New product!", notCurrency:c=>"That is "+c+". Today the shop uses "+CUR[S.currency].name.en, currencySet:c=>"Currency is now "+c, delBtn:"🗑", moneyRow:"Real money: 7 + currency digit + value", realRow:"Barcode of any real product",
+  det:{ idle:"Scan the barcode of any food from the kitchen and I'll reveal its secrets!", searching:"The detective is checking the file…", notFound:"I couldn't find this product in the database.", notFoundHint:"Try another product, or add it yourself at openfoodfacts.org",
+  guessQ:"🤔 Guess: how many sugar cubes in 100 g?", reveal:"Show the answer", right:"That's right! 🎉", close:n=>"Close! The answer: "+n,
+  sugarIn100:"In 100 g", per:g=>"Per serving ("+g+" g)", cubesTxt:n=>n===0?"almost no sugar":(n===1?"1 sugar cube":n+" sugar cubes"), gSugar:g=>g+" g sugar",
+  v:{green:"🟢 Everyday food", yellow:"🟡 Sometimes food", red:"🔴 Just a treat", unknown:"⚪ Not enough information"},
+  nutri:"Nutrition score (Nutri-Score)", nova:"Processing (NOVA)", novaTxt:["Unprocessed","Kitchen ingredient","Processed","Ultra-processed"],
+  levels:"Per 100 g", fat:"Fat", sat:"Saturated fat", sugars:"Sugar", salt:"Salt", kcal:"Calories",
+  lv:{low:"low", moderate:"medium", high:"high"}, allergens:"⚠️ Allergens", traces:"May contain traces of:", noAllergens:"No allergens listed",
+  diet:"🌱 Type", vegan:"Vegan", vegetarian:"Vegetarian", nonVegan:"Contains animal ingredients", palm:"Palm oil", noPalm:"No palm oil",
+  halalTitle:"🕌 Halal check (parents)", halalLabel:"✓ Halal label", halalOk:"No suspicious ingredients found in the list.", halalWarn:"Check these ingredients:", halalNote:"A text check of the ingredient list, not a halal certificate.",
+  hf:{gel:"Gelatine (may be pork)", gelbeef:"Beef gelatine (check slaughter)", pork:"Pork products", alc:"Alcohol", carmine:"Carmine colour (from insects)", cyst:"L-cysteine (may be animal)"},
+  ingredients:"📋 Ingredients", additives:"🧪 Additives", noAdditives:"No additives listed", noIngr:"Ingredients not available.",
+  toShop:"🛒 Add to the shop", more:"Source: Open Food Facts", side:"🗂️ Case file", checked:"Products checked", empty:"No products checked yet.",
+  rankNext:n=>n+" more to the next title", rankMax:"Top title! 👑", least:"🏆 Least sugar:", levelUp:t=>"Level up! Your title: "+t,
+  lvl:["New detective","Junior detective","Skilled detective","Expert detective","Chief detective"], guessToggle:"Guessing game before the answer", halalToggle:"Show the halal check", pDet:"🔍 Food detective" },
   pTitle:"Parents' panel", pTest:"Try without a scanner", scan:"Scan", pBal:"Balances", saveBal:"Save balances", saved:"Balances saved", badNum:"Enter a whole number, 0 or more",
   pTime:"Closing time", limitOff:"No time limit", limitMin:n=>"Close the shop after "+n+" minutes", reopen:"Reopen the shop",
   timeLeft:n=>n+" minutes until closing", timeOff:"No closing time set", reopened:"Shop reopened",
@@ -572,7 +648,7 @@ const L = {
    payFirst:"Finish paying first", cashStarted:"You started paying with cash. Keep going with money",
    pendBonus:"Scan the card of who earned the bonus", pendBalance:"Scan a card", welcome:"Welcome to Fatima and Sama's shop",
    mission:l=>"Shopping list: "+l, missionDone:"Great! The list is complete",
-   mode:{shop:"The shop is open", clinic:"The clinic is open. Hello, doctor", treasure:"Treasure adventure"},
+   mode:{shop:"The shop is open", clinic:"The clinic is open. Hello, doctor", treasure:"Treasure adventure", detective:"Food detective mode"},
    patient:(n,a)=>n+". Diagnosis: "+a+". What does it need?", correct:m=>m+". Correct!", wrong:"No, try another treatment", healed:n=>"Wonderful! "+n+" is all better",
    needPatient:"Scan a patient's wristband first",
    clue:r=>r, found:"You found it!", notHere:"Not here", treasure:"You found the treasure! Congratulations", closed:"The shop is closed now. See you tomorrow"
@@ -580,7 +656,7 @@ const L = {
  },
  de:{
   dir:"ltr", label:"DE", voice:/^de/i,
-  brand:"Fatimas & Samas Laden", modes:{shop:"Laden",clinic:"Praxis",treasure:"Schatz"},
+  brand:"Fatimas & Samas Laden", modes:{shop:"Laden",clinic:"Praxis",treasure:"Schatz",detective:"Detektiv"},
   stars:n=> n===1?"1 Stern": n+" Sterne", items:n=> n===1?"1 Artikel": n+" Artikel",
   total:"Summe", receipt:"Kassenbon", sum:"Gesamt",
   cashLine:(c,r)=>"Bar "+fmt(c)+" · noch "+fmt(r),
@@ -609,6 +685,20 @@ const L = {
         mission:"🎯 Neue Einkaufsliste", "m:shop":"🛒 Laden", "m:clinic":"🏥 Arztpraxis", "m:treasure":"🗺️ Schatzsuche"},
   holdHint:"⚙︎ lange drücken, um den Elternbereich zu öffnen", pFamily:"🎙️ Familienstimme", famInfo:"Sprich diese Sätze selbst ein. Die Aufnahmen bleiben auf diesem Gerät und ersetzen die eingebaute Stimme.", famRec:"● Aufnehmen", famStop:"■ Stopp", famPlay:"▶", famDel:"🗑", famHas:"✓ Familienstimme", micNo:"Das Mikrofon ist hier nicht verfügbar. Öffne das Spiel über den GitHub-Link auf dem Tablet.", voiceHuman:n=>"🎧 Menschliche Stimmen bereit ("+n+" Clips)",
   pMoney:"💶 Währung", simplePrices:"Einfache Preise ohne Cent (gut für Sama)", rateNote:"Feste Spielkurse, keine Marktkurse.", pReal:"📦 Echte Produkte", realInfo:"Scanne den Barcode von etwas aus der Küche: Er wird bei Open Food Facts gesucht und kommt in den Laden. Namen und Preise hier ändern.", noReal:"Noch keine echten Produkte. Scanne einen Barcode aus der Küche.", exportBtn:"⬇️ Sichern", importBtn:"⬆️ Wiederherstellen", imported:n=>n+" Produkte wiederhergestellt", searchingTxt:"Moment, ich suche das Produkt…", newProd:"Neues Produkt!", notCurrency:c=>"Das ist "+c+". Heute zahlt man hier mit "+CUR[S.currency].name.de, currencySet:c=>"Währung jetzt: "+c, delBtn:"🗑", moneyRow:"Echtes Spielgeld: 7 + Währungsziffer + Wert", realRow:"Barcode eines echten Produkts",
+  det:{ idle:"Scanne den Barcode eines Lebensmittels aus der Küche – ich verrate dir seine Geheimnisse!", searching:"Die Detektivin prüft die Akte…", notFound:"Dieses Produkt habe ich nicht gefunden.", notFoundHint:"Probier ein anderes Produkt oder trag es selbst auf openfoodfacts.org ein",
+  guessQ:"🤔 Rate mal: Wie viele Zuckerwürfel in 100 g?", reveal:"Antwort zeigen", right:"Richtig! 🎉", close:n=>"Fast! Richtig ist: "+n,
+  sugarIn100:"In 100 g", per:g=>"Pro Portion ("+g+" g)", cubesTxt:n=>n===0?"fast kein Zucker":(n===1?"1 Zuckerwürfel":n+" Zuckerwürfel"), gSugar:g=>g+" g Zucker",
+  v:{green:"🟢 Für jeden Tag", yellow:"🟡 Für manchmal", red:"🔴 Nur ab und zu", unknown:"⚪ Zu wenig Informationen"},
+  nutri:"Nährwertbewertung (Nutri-Score)", nova:"Verarbeitung (NOVA)", novaTxt:["Unverarbeitet","Küchenzutat","Verarbeitet","Stark verarbeitet"],
+  levels:"Pro 100 g", fat:"Fett", sat:"Gesättigte Fette", sugars:"Zucker", salt:"Salz", kcal:"Kalorien",
+  lv:{low:"wenig", moderate:"mittel", high:"viel"}, allergens:"⚠️ Allergene", traces:"Kann Spuren enthalten von:", noAllergens:"Keine Allergene angegeben",
+  diet:"🌱 Art", vegan:"Vegan", vegetarian:"Vegetarisch", nonVegan:"Enthält tierische Zutaten", palm:"Palmöl", noPalm:"Ohne Palmöl",
+  halalTitle:"🕌 Halal-Check (für Eltern)", halalLabel:"✓ Halal-Siegel", halalOk:"Keine verdächtigen Zutaten in der Liste gefunden.", halalWarn:"Diese Zutaten prüfen:", halalNote:"Nur ein Textabgleich der Zutatenliste, kein Halal-Zertifikat.",
+  hf:{gel:"Gelatine (evtl. vom Schwein)", gelbeef:"Rindergelatine (Schlachtung prüfen)", pork:"Schweinefleisch-Produkte", alc:"Alkohol", carmine:"Karmin (aus Insekten)", cyst:"L-Cystein (evtl. tierisch)"},
+  ingredients:"📋 Zutaten", additives:"🧪 Zusatzstoffe", noAdditives:"Keine Zusatzstoffe angegeben", noIngr:"Zutaten nicht verfügbar.",
+  toShop:"🛒 In den Laden", more:"Quelle: Open Food Facts", side:"🗂️ Ermittlungsakte", checked:"Geprüfte Produkte", empty:"Noch keine Produkte geprüft.",
+  rankNext:n=>"Noch "+n+" bis zum nächsten Titel", rankMax:"Höchster Titel! 👑", least:"🏆 Am wenigsten Zucker:", levelUp:t=>"Aufgestiegen! Dein Titel: "+t,
+  lvl:["Neue Detektivin","Nachwuchs-Detektivin","Geschickte Detektivin","Profi-Detektivin","Chef-Detektivin"], guessToggle:"Ratespiel vor der Antwort", halalToggle:"Halal-Check anzeigen", pDet:"🔍 Lebensmittel-Detektivin" },
   pTitle:"Elternbereich", pTest:"Ohne Scanner testen", scan:"Scannen", pBal:"Guthaben", saveBal:"Guthaben speichern", saved:"Guthaben gespeichert", badNum:"Bitte eine ganze Zahl ab 0 eingeben",
   pTime:"Ladenschluss", limitOff:"Keine Zeitgrenze", limitMin:n=>"Laden schließt nach "+n+" Minuten", reopen:"Laden wieder öffnen",
   timeLeft:n=>"Noch "+n+" Minuten bis Ladenschluss", timeOff:"Kein Ladenschluss eingestellt", reopened:"Laden wieder geöffnet",
@@ -628,7 +718,7 @@ const L = {
    payFirst:"Erst fertig bezahlen", cashStarted:"Du zahlst bar. Bitte mit Geld weiterzahlen",
    pendBonus:"Scanne die Karte von der Person, die den Bonus verdient hat", pendBalance:"Scanne eine Karte", welcome:"Willkommen in Fatimas und Samas Laden",
    mission:l=>"Einkaufsliste: "+l, missionDone:"Super! Die Liste ist komplett",
-   mode:{shop:"Der Laden ist offen", clinic:"Die Praxis ist offen. Hallo, Frau Doktor", treasure:"Schatzsuche"},
+   mode:{shop:"Der Laden ist offen", clinic:"Die Praxis ist offen. Hallo, Frau Doktor", treasure:"Schatzsuche", detective:"Lebensmittel-Detektivin"},
    patient:(n,a)=>n+". Diagnose: "+a+". Was braucht es?", correct:m=>m+". Richtig!", wrong:"Nein, probier eine andere Behandlung", healed:n=>"Wunderbar! "+n+" ist wieder gesund",
    needPatient:"Scanne zuerst das Armband eines Patienten",
    clue:r=>r, found:"Gefunden!", notHere:"Nicht hier", treasure:"Du hast den Schatz gefunden! Glückwunsch", closed:"Der Laden ist jetzt geschlossen. Bis morgen"
@@ -803,8 +893,11 @@ const CAT_PRICE = [["waters",60],["sodas",120],["carbonated",120],["juices",180]
   ["rices",200],["coffees",500],["teas",250],["fruits",150],["vegetables",120],["ice-creams",300],["frozen",300],["baby",200],["spreads",300],
   ["sauces",180],["oils",400],["beverages",150],["snacks",150],["cosmetics",300],["shampoos",250]];
 function estimatePrice(tags){ const t = (tags||[]).join(" "); for(const [k,v] of CAT_PRICE) if(t.includes(k)) return v; return 199; }
-async function lookupReal(code){
-  const f = "product_name,product_name_ar,product_name_en,product_name_de,generic_name,brands,quantity,categories_tags,image_front_small_url,image_front_url";
+const DET_FIELDS = "code,product_name,product_name_ar,product_name_en,product_name_de,generic_name,brands,quantity,categories_tags,image_front_small_url,image_front_url,"+
+  "nutriscore_grade,nova_group,ecoscore_grade,nutriments,nutrient_levels,allergens_tags,traces_tags,additives_tags,ingredients_text,ingredients_text_ar,ingredients_text_en,"+
+  "ingredients_text_de,ingredients_tags,ingredients_analysis_tags,labels_tags,serving_quantity,serving_size";
+async function lookupReal(code, fields){
+  const f = fields || DET_FIELDS;
   for(const host of ["world.openfoodfacts.org","world.openproductsfacts.org","world.openbeautyfacts.org"]){
     try{ const r = await fetch("https://"+host+"/api/v2/product/"+code+".json?fields="+f); if(!r.ok) continue;
       const j = await r.json(); if(j && j.status===1 && j.product) return j.product; }catch(e){}
@@ -817,13 +910,39 @@ async function imgToData(url){
 }
 async function addReal(code){
   const p = await lookupReal(code);
+  const rec = await recFromProduct(code, p);
+  if(p) rec.info = buildInfo(p);
+  await catPut(rec); return rec;
+}
+async function recFromProduct(code, p){
   const any = p ? (p.product_name || p.generic_name || p.product_name_en || p.product_name_de || p.product_name_ar || "") : "";
   const tail = code.slice(-4);
-  const names = { ar: (p && p.product_name_ar) || any || ("منتج "+tail), en: (p && p.product_name_en) || any || ("Product "+tail), de: (p && p.product_name_de) || any || ("Produkt "+tail) };
+  const pn = k => (p && p[k]) || "";   /* we live in Germany: German name is the best fallback */
+  const names = { ar: pn("product_name_ar") || pn("product_name_de") || pn("product_name_en") || any || ("منتج "+tail), en: pn("product_name_en") || pn("product_name_de") || any || ("Product "+tail), de: pn("product_name_de") || pn("product_name_en") || any || ("Produkt "+tail) };
   const imgUrl = p && (p.image_front_small_url || p.image_front_url);
   const rec = { code, schema:1, src: p ? "openfoodfacts" : "manual", names, brand: (p && p.brands) || "", qty: (p && p.quantity) || "",
     base: estimatePrice(p && p.categories_tags), img: imgUrl ? await imgToData(imgUrl) : "", added: Date.now() };
-  await catPut(rec); return rec;
+  return rec;
+}
+function buildInfo(p){
+  const n = p.nutriments || {};
+  const num = k => { const v = n[k]; if(v===undefined || v===null || v==="") return null; const f = typeof v==="number" ? v : parseFloat(v); return isNaN(f) ? null : f; };
+  return { at: Date.now(),
+    ns: /^[a-e]$/.test(p.nutriscore_grade||"") ? p.nutriscore_grade : null,
+    nova: [1,2,3,4].includes(+p.nova_group) ? +p.nova_group : null,
+    n: { sugars:num("sugars_100g"), fat:num("fat_100g"), sat:num("saturated-fat_100g"), salt:num("salt_100g"), kcal:num("energy-kcal_100g") },
+    levels: p.nutrient_levels || {}, allergens: p.allergens_tags || [], traces: p.traces_tags || [], additives: p.additives_tags || [],
+    ingr: { ar:p.ingredients_text_ar||"", en:p.ingredients_text_en||"", de:p.ingredients_text_de||"", any:p.ingredients_text||"" },
+    itags: p.ingredients_tags || [], analysis: p.ingredients_analysis_tags || [], labels: p.labels_tags || [],
+    serving: +p.serving_quantity > 0 ? +p.serving_quantity : null, imgBig: p.image_front_url || "" };
+}
+async function getFoodInfo(code){
+  let rec = REAL[code];
+  if(rec && rec.info && Date.now() - (rec.info.at||0) < 30*864e5) return rec;
+  const p = await lookupReal(code, DET_FIELDS);
+  if(!p) return rec && rec.info ? rec : null;
+  if(!rec) rec = await recFromProduct(code, p);
+  rec.info = buildInfo(p); rec.schema = 2; await catPut(rec); return rec;
 }
 const FAMILY_KEYS = ["welcome","paid_9001","paid_9002","bonus_9001","bonus_9002","healedPre","found","treasure","closed"];
 
@@ -866,6 +985,61 @@ const V = {
       (c.hint?'':'<div class="choice"><button class="pill light" type="button" data-act="clinicHint">'+t.hint+'</button></div>');
   },
   clinicHealed: code => ()=>'<div class="big-emoji" data-say="healedPre pat_'+code+' healedPost" data-fb="'+esc(patName(code))+'">'+PATIENTS[code][0]+'</div><p class="big-name">'+esc(T().clinic.healed(patName(code)))+'</p><div class="mid-emoji">🩷✨</div>',
+  detIdle: ()=>'<div class="big-emoji">🔍</div><p class="big-name">'+T().modes.detective+'</p><p class="hint">'+T().det.idle+'</p>',
+  detCard: ()=>{
+    const r = REAL[det.code]; if(!r || !r.info) return V.detIdle();
+    const t = T().det, i = r.info, c = cubesOf(i), v = det.revealed ? verdict(i) : null, lang = S.lang;
+    const img = detImg(r);
+    let h = '<div class="det"><div class="det-top"><div class="det-img">'+(img ? '<img src="'+esc(img)+'" alt="">' : '📦')+'</div>'+
+      '<div class="det-id"><p class="big-name" data-say="t:'+encodeURIComponent(pname(det.code))+'" data-fb="'+esc(pname(det.code))+'">'+esc(pname(det.code))+'</p>'+
+      '<p class="hint">'+esc([r.brand, r.qty].filter(Boolean).join(" · "))+'</p>'+
+      (v ? '<div class="verdict v-'+v+'" data-say="v_'+v+'" data-fb="'+esc(t.v[v])+'">'+t.v[v]+'</div>' : '')+'</div></div>';
+    if(!det.revealed){
+      h += '<div class="guess"><p class="q" data-say="guessQ" data-fb="'+esc(t.guessQ)+'">'+t.guessQ+'</p><div class="choice">'+
+        det.guess.opts.map(n=>'<button class="pill" type="button" data-act="guess" data-n="'+n+'">'+n+'</button>').join("")+'</div>'+
+        '<div><button class="pill light" type="button" data-act="reveal">'+t.reveal+'</button></div></div></div>';
+      return h;
+    }
+    if(det.picked!=null) h += '<p class="hint" style="text-align:center;max-width:none">'+(det.picked===det.guess.answer ? t.right : esc(t.close(det.guess.answer)))+'</p>';
+    if(c!=null){
+      const show = Math.min(c, 40), sv = i.serving ? Math.round(i.n.sugars*i.serving/100/4) : null;
+      h += '<div class="cubes" data-say="'+["sugarIn"].concat(cubeToks(c)).join(" ")+'" data-fb="'+esc(t.cubesTxt(c))+'"><div class="lbl"><span>🧊 '+t.sugarIn100+': '+esc(t.cubesTxt(c))+'</span><span class="src">'+esc(t.gSugar(fmtG(i.n.sugars)))+'</span></div>'+
+        '<div class="row">'+Array.from({length:show},(_,k)=>'<span class="cube" style="animation-delay:'+(k*40)+'ms"></span>').join("")+(c>show?'<span class="more">+'+(c-show)+'</span>':'')+'</div>'+
+        (sv!=null ? '<div class="src">'+esc(t.per(i.serving))+': '+esc(t.cubesTxt(sv))+'</div>' : '')+'</div>';
+    }
+    // facts
+    let f = '<div class="facts">';
+    f += '<div class="fact"><h5>'+t.nutri+'</h5><div class="ns">'+"abcde".split("").map(x=>'<span class="'+x+(i.ns===x?' on':'')+'">'+x.toUpperCase()+'</span>').join("")+'</div>'+(i.ns?'':'<span class="src">–</span>')+'</div>';
+    f += '<div class="fact"><h5>'+t.nova+'</h5><div class="nova">'+[1,2,3,4].map(k=>'<i class="'+(i.nova && k<=i.nova?'on':'')+'"></i>').join("")+'</div><span>'+(i.nova ? i.nova+' · '+t.novaTxt[i.nova-1] : '–')+'</span></div>';
+    const lv = i.levels || {}, row = [["fat","fat"],["sat","saturated-fat"],["sugars","sugars"],["salt","salt"]].filter(([k])=>i.n[k]!=null);
+    if(row.length || i.n.kcal!=null) f += '<div class="fact"><h5>'+t.levels+'</h5><div class="chips2">'+row.map(([k,lk])=>'<span class="chip2 lv-'+(lv[lk]||"")+'">'+t[k]+' '+fmtG(i.n[k])+' g'+(lv[lk]?' · '+t.lv[lv[lk]]:'')+'</span>').join("")+
+      (i.n.kcal!=null?'<span class="chip2">'+t.kcal+' '+Math.round(i.n.kcal)+'</span>':'')+'</div></div>';
+    const al = (i.allergens||[]).map(tagName), tr = (i.traces||[]).map(tagName).filter(x=>!al.includes(x));
+    const aName = k => ALLERGENS[k] ? ALLERGENS[k][0]+' '+ALLERGENS[k][1+LANG_IDX[lang]] : k;
+    f += '<div class="fact"><h5>'+t.allergens+'</h5>'+(al.length ? '<div class="chips2">'+al.map(k=>'<span class="chip2 lv-high">'+esc(aName(k))+'</span>').join("")+'</div>' : '<span class="src">'+t.noAllergens+'</span>')+
+      (tr.length ? '<span class="src">'+t.traces+' '+esc(tr.map(aName).join("، "))+'</span>' : '')+'</div>';
+    const an = i.analysis || [], d = [];
+    if(an.includes("en:vegan")) d.push('<span class="chip2 lv-low">🌱 '+t.vegan+'</span>'); else if(an.includes("en:vegetarian")) d.push('<span class="chip2 lv-low">🥕 '+t.vegetarian+'</span>');
+    if(an.includes("en:non-vegan") && !an.includes("en:vegetarian")) d.push('<span class="chip2">🐄 '+t.nonVegan+'</span>');
+    if(an.includes("en:palm-oil")) d.push('<span class="chip2 lv-moderate">🌴 '+t.palm+'</span>'); else if(an.includes("en:palm-oil-free")) d.push('<span class="chip2 lv-low">🌴 '+t.noPalm+'</span>');
+    if(d.length) f += '<div class="fact"><h5>'+t.diet+'</h5><div class="chips2">'+d.join("")+'</div></div>';
+    f += '</div>';
+    h += f;
+    if(S.halal!==false){
+      const hc = halalCheck(r), cls = hc.flags.length ? "warn" : (hc.label ? "ok" : "info");
+      h += '<div class="halal '+cls+'"><b>'+t.halalTitle+'</b>'+(hc.label?'<span>'+t.halalLabel+'</span>':'')+
+        (hc.flags.length ? '<span>'+t.halalWarn+'</span><div class="chips2">'+hc.flags.map(k=>'<span class="chip2 lv-moderate">'+esc(t.hf[k])+'</span>').join("")+'</div>' : '<span>'+t.halalOk+'</span>')+
+        '<span class="src">'+t.halalNote+'</span></div>';
+    }
+    const ingr = i.ingr[lang] || i.ingr.de || i.ingr.en || i.ingr.any || "";
+    const adds = (i.additives||[]).map(tagName);
+    h += '<details class="ingr"><summary>'+t.ingredients+'</summary><p>'+(ingr ? esc(ingr) : t.noIngr)+'</p></details>';
+    h += '<details class="ingr"'+(adds.length?'':' ')+'><summary>'+t.additives+' ('+adds.length+')</summary>'+(adds.length ? '<ul class="addl">'+adds.map(a=>{ const key = a.replace(/[a-z]$/,""); const note = (ADDITIVE_NOTES[lang]||{})[key] || (ADDITIVE_NOTES[lang]||{})[a] || "";
+      return '<li><b>'+esc(a.toUpperCase())+'</b> '+esc(note)+'</li>'; }).join("")+'</ul>' : '<p>'+t.noAdditives+'</p>')+'</details>';
+    h += '<div class="choice"><button class="pill" type="button" data-act="detShop">'+t.toShop+'</button>'+
+      '<a class="pill light" style="text-decoration:none" href="https://world.openfoodfacts.org/product/'+det.code+'" target="_blank" rel="noopener">'+t.more+'</a></div></div>';
+    return h;
+  },
   huntSetup: ()=>{
     const t = T().treasure;
     return '<div class="big-emoji">🗺️</div><p class="big-name">'+t.setup+'</p><div class="choice">'+
@@ -886,17 +1060,112 @@ const V = {
   huntDone: ()=>'<div class="big-emoji">💎</div><p class="big-name">'+T().treasure.treasure+'</p><p class="hint">'+T().treasure.treasureText+'</p>'+
       '<div class="choice"><button class="pill" type="button" data-act="huntAgain">'+T().treasure.again+'</button></div>'
 };
+/* ================= 🔍 Food detective ================= */
+let det = null, detBusy = false;   // det = {code, revealed, guess:{opts, answer}, picked}
+const ALLERGENS = { gluten:["🌾","غلوتين","Gluten","Gluten"], milk:["🥛","حليب","Milk","Milch"], eggs:["🥚","بيض","Eggs","Eier"], nuts:["🌰","مكسرات","Tree nuts","Schalenfrüchte"],
+  peanuts:["🥜","فول سوداني","Peanuts","Erdnüsse"], soybeans:["🫘","صويا","Soy","Soja"], fish:["🐟","سمك","Fish","Fisch"], crustaceans:["🦐","قشريات","Crustaceans","Krebstiere"],
+  molluscs:["🐚","رخويات","Molluscs","Weichtiere"], "sesame-seeds":["⚪","سمسم","Sesame","Sesam"], celery:["🥬","كرفس","Celery","Sellerie"], mustard:["🟡","خردل","Mustard","Senf"],
+  lupin:["🌼","ترمس","Lupin","Lupinen"], "sulphur-dioxide-and-sulphites":["🧪","كبريتيت","Sulphites","Sulfite"] };
+const ADDITIVE_NOTES = {
+  ar:{ e102:"صبغة صفراء – الاتحاد الأوروبي يفرض تحذيراً: قد تؤثر على نشاط وانتباه الأطفال", e104:"صبغة – تحذير أوروبي على نشاط الأطفال", e110:"صبغة برتقالية – تحذير أوروبي على نشاط الأطفال",
+       e122:"صبغة حمراء – تحذير أوروبي على نشاط الأطفال", e124:"صبغة حمراء – تحذير أوروبي على نشاط الأطفال", e129:"صبغة حمراء – تحذير أوروبي على نشاط الأطفال",
+       e171:"ثاني أكسيد التيتانيوم – ممنوع في أغذية الاتحاد الأوروبي منذ 2022", e120:"كارمين – صبغة من حشرات", e441:"جيلاتين", e250:"نتريت – مادة حافظة في اللحوم المصنعة",
+       e251:"نترات – مادة حافظة", e252:"نترات – مادة حافظة", e621:"غلوتامات – مُحسّن نكهة", e951:"أسبارتام – مُحلٍّ صناعي", e330:"حمض الستريك – شائع وآمن عادة", e322:"ليسيثين – مستحلب شائع" },
+  en:{ e102:"Yellow colour – EU warning: may affect activity and attention in children", e104:"Colour – EU warning on children's activity", e110:"Orange colour – EU warning on children's activity",
+       e122:"Red colour – EU warning on children's activity", e124:"Red colour – EU warning on children's activity", e129:"Red colour – EU warning on children's activity",
+       e171:"Titanium dioxide – banned in EU food since 2022", e120:"Carmine – colour made from insects", e441:"Gelatine", e250:"Nitrite – preservative in cured meat",
+       e251:"Nitrate – preservative", e252:"Nitrate – preservative", e621:"Glutamate – flavour enhancer", e951:"Aspartame – sweetener", e330:"Citric acid – common, usually harmless", e322:"Lecithin – common emulsifier" },
+  de:{ e102:"Gelber Farbstoff – EU-Warnhinweis: kann Aktivität und Aufmerksamkeit bei Kindern beeinträchtigen", e104:"Farbstoff – EU-Warnhinweis für Kinder", e110:"Oranger Farbstoff – EU-Warnhinweis für Kinder",
+       e122:"Roter Farbstoff – EU-Warnhinweis für Kinder", e124:"Roter Farbstoff – EU-Warnhinweis für Kinder", e129:"Roter Farbstoff – EU-Warnhinweis für Kinder",
+       e171:"Titandioxid – seit 2022 in EU-Lebensmitteln verboten", e120:"Karmin – Farbstoff aus Insekten", e441:"Gelatine", e250:"Nitrit – Konservierung von Wurstwaren",
+       e251:"Nitrat – Konservierungsstoff", e252:"Nitrat – Konservierungsstoff", e621:"Glutamat – Geschmacksverstärker", e951:"Aspartam – Süßstoff", e330:"Zitronensäure – verbreitet, meist unbedenklich", e322:"Lecithin – verbreiteter Emulgator" } };
+const LEVELS = [0, 3, 10, 25, 50];
+function rankOf(n){ let r = 0; LEVELS.forEach((t,i)=>{ if(n>=t) r = i; }); return r; }
+const tagName = t => String(t).replace(/^[a-z]{2}:/,"");
+const fmtG = x => Number((+x).toFixed(1)).toLocaleString(S.lang==="ar" ? "ar-u-nu-latn" : S.lang);
+function cubesOf(i){ return i && i.n && i.n.sugars!=null ? Math.round(i.n.sugars/4) : null; }
+function verdict(i){
+  if(!i) return "unknown";
+  let v = null;
+  if(i.ns) v = (i.ns==="a"||i.ns==="b") ? "green" : i.ns==="c" ? "yellow" : "red";
+  else {
+    const lv = i.levels || {}, highs = ["fat","saturated-fat","sugars","salt"].filter(k=>lv[k]==="high").length;
+    if(i.n.sugars!=null && i.n.sugars>=22.5) v = "red"; else if(highs>=2) v = "red"; else if(highs===1) v = "yellow";
+    else if(Object.keys(lv).length || i.n.sugars!=null) v = "green";
+  }
+  if(!v) return "unknown";
+  if(i.nova===4 && v==="green") v = "yellow";
+  return v;
+}
+function halalCheck(rec){
+  const i = rec.info || {}, labels = (i.labels||[]).join(" ");
+  let txt = [i.ingr.any, i.ingr.de, i.ingr.en, i.ingr.ar, (i.itags||[]).join(" "), (i.additives||[]).join(" ")].join(" ").toLowerCase();
+  txt = txt.replace(/zuckeralkohol\w*|sugar[ -]alcohols?|polyol\w*|weinsäure|weinstein|alkoholfrei|alcohol[- ]free|sans alcool/g, " ");
+  const flags = [];
+  if(/gelatin|gélatine|جيلاتين|e\s?441\b/.test(txt)) flags.push(/rind|beef|bovine|بقر/.test(txt) ? "gelbeef" : "gel");
+  if(/schwein|pork|porc|\blard\b|schmalz|\bspeck\b|bacon|schinken|\bham\b|خنزير/.test(txt)) flags.push("pork");
+  if(/alkohol|alcohol|ethanol|\bwein\b|\bwine\b|\brum\b|likör|liqueur|\bbier\b|\bbeer\b|brandy|cognac|whisk|كحول/.test(txt)) flags.push("alc");
+  if(/karmin|carmin|cochenille|cochineal|e\s?120\b/.test(txt)) flags.push("carmine");
+  if(/l-cystein|e\s?920\b/.test(txt)) flags.push("cyst");
+  return { label: /halal/.test(labels), flags };
+}
+function cubeToks(n){ return n===0 ? ["noSugar"] : countToks(n, "u_cube", false); }
+function makeGuess(i){
+  const a = cubesOf(i); if(a==null) return null;
+  const set = new Set([a]); const cand = [a+3, Math.max(0,a-2), a*2+1, a+6, Math.max(0, a-4), a+1];
+  for(const c of cand){ if(set.size>=3) break; if(!set.has(c)) set.add(c); }
+  return { opts: shuffle([...set]), answer: a };
+}
+function detLvlText(n){ return T().det.lvl[rankOf(n)]; }
+const detImg = r => r && r.info && r.info.imgBig && navigator.onLine!==false ? r.info.imgBig : (r && r.img) || "";
+function revealSpeech(rec, outcome){
+  const i = rec.info, c = cubesOf(i), v = verdict(i); let toks = [];
+  if(outcome==="right") toks.push("guessRight");
+  if(outcome==="close"){ toks.push("guessClose"); if(c!=null) toks = toks.concat(cubeToks(c)); }
+  else if(c!=null){ toks = toks.concat(["sugarIn"], cubeToks(c)); }
+  toks.push("v_"+v);
+  if((i.allergens||[]).length) toks.push("allergyWarn");
+  if(S.halal!==false && halalCheck(rec).flags.length) toks.push("halalWarn");
+  const t = T().det; speak(toks, (c!=null ? t.sugarIn100+": "+t.cubesTxt(c)+". " : "") + t.v[v].replace(/^\S+\s/,""));
+}
+async function handleDetective(code, act){
+  if(act==="clear"){ det = null; SFX.soft(); render(); view(V.detIdle); return; }
+  if(KIDS[code] || moneyCard(code) || PRODUCTS[code]){ setMode("shop", false); handleShop(code, act); return; }
+  if(!isEAN(code)){ err(()=>T().unknown(code), T().say.unknown); return; }
+  if(detBusy) return;
+  detBusy = true; SFX.soft(); view(V.msg("🔍", ()=>T().det.searching), "pop"); speak(["searching"], T().det.searching);
+  let rec = null; try{ rec = await getFoodInfo(code); }catch(e){}
+  detBusy = false;
+  if(!rec || !rec.info){ SFX.error(); view(V.msg("🤷", ()=>T().det.notFound, ()=>T().det.notFoundHint), "err shake"); speak(["notFound"], T().det.notFound); return; }
+  const before = rankOf(S.detCount||0);
+  if(!(S.detLog||[]).includes(code)) S.detCount = (S.detCount||0) + 1;
+  S.detLog = [code].concat((S.detLog||[]).filter(c=>c!==code)).slice(0, 40); save();
+  const guess = S.detGuess===false ? null : makeGuess(rec.info);
+  det = { code, revealed: !guess, guess, picked: null };
+  SFX.ding(); render(); view(V.detCard);
+  const after = rankOf(S.detCount);
+  if(guess) speak(["t:"+pname(code), "guessQ"], pname(code)+". "+T().det.guessQ);
+  else revealSpeech(rec, null);
+  if(after>before){ setTimeout(()=>{ confetti(); SFX.fanfare(); toast(T().det.levelUp(detLvlText(S.detCount))); speak(["levelUp","lvl_"+after], T().det.levelUp(detLvlText(S.detCount))); }, 4200); }
+}
+function pickGuess(n){
+  if(!det || det.revealed) return;
+  det.revealed = true; det.picked = n;
+  const rec = REAL[det.code], right = n===det.guess.answer;
+  if(right){ SFX.heal(); confetti(); } else SFX.soft();
+  view(V.detCard); revealSpeech(rec, right ? "right" : "close");
+}
 const ERR_KEYS = ()=>{ const s=T().say; return [[s.payFirst,"payFirst"],[s.empty,"empty"],[s.cashStarted,"cashStarted"],[s.unknown,"unknown"],[s.needPatient,"needPatient"]]; };
 function err(titleFn, spoken, tokens){ SFX.error(); view(V.msg("🙈", titleFn), "err shake");
   if(!tokens){ const hit = ERR_KEYS().find(([t])=>t===spoken); tokens = hit ? [hit[1]] : null; }
   if(tokens) speak(tokens, spoken); else ttsSay(spoken); }
-function modeIdleView(){ return S.mode==="shop" ? V.idle : S.mode==="clinic" ? (clinic ? V.clinicCase : V.clinicIdle) : (hunt && !hunt.done ? V.huntClue : hunt && hunt.done ? V.huntDone : V.huntSetup); }
+function modeIdleView(){ return S.mode==="detective" ? (det ? V.detCard : V.detIdle) : S.mode==="shop" ? V.idle : S.mode==="clinic" ? (clinic ? V.clinicCase : V.clinicIdle) : (hunt && !hunt.done ? V.huntClue : hunt && hunt.done ? V.huntDone : V.huntSetup); }
 
 /* ================= Rendering ================= */
 function langButtons(){ return Object.keys(L).map(k=>'<button type="button" data-lang="'+k+'" aria-pressed="'+(k===S.lang)+'" lang="'+k+'">'+L[k].label+'</button>').join(""); }
 function modeButtons(){
-  const em = {shop:"🛒",clinic:"🏥",treasure:"🗺️"};
-  return ["shop","clinic","treasure"].map(m=>'<button type="button" data-mode="'+m+'" aria-pressed="'+(S.mode===m)+'"><span class="me" aria-hidden="true">'+em[m]+'</span><span class="ml">'+T().modes[m]+'</span></button>').join("");
+  const em = {shop:"🛒",clinic:"🏥",treasure:"🗺️",detective:"🔍"};
+  return ["shop","clinic","treasure","detective"].map(m=>'<button type="button" data-mode="'+m+'" aria-pressed="'+(S.mode===m)+'"><span class="me" aria-hidden="true">'+em[m]+'</span><span class="ml">'+T().modes[m]+'</span></button>').join("");
 }
 function applyLang(){
   const t = T();
@@ -918,6 +1187,10 @@ function render(){
     $("lcdLabel").textContent = t.total; $("lcdValue").textContent = S.currency==="STAR" ? v : fmtNum(v); $("lcdUnit").textContent = C().sym[S.lang];
     const lc = document.querySelector(".lcd"); lc.dataset.say = amt(v).join(" "); lc.dataset.fb = fmt(v);
     $("lcdSub").textContent = cash>0 ? t.cashLine(cash, Math.max(0,v-cash)) : (pending ? (pending.type==="bonus"?t.pendBonus:t.pendBalance) : "");
+  }else if(S.mode==="detective"){
+    delete document.querySelector(".lcd").dataset.say;
+    $("lcdLabel").textContent = t.det.checked; $("lcdValue").textContent = S.detCount||0; $("lcdUnit").textContent = "🔍";
+    $("lcdSub").textContent = detLvlText(S.detCount||0);
   }else if(S.mode==="clinic"){
     delete document.querySelector(".lcd").dataset.say;
     const n = Object.values(S.healed).reduce((a,b)=>a+b,0);
@@ -954,6 +1227,19 @@ function renderSide(){
       '<div class="rsub">'+(cart.length?t.items(cart.length):"")+'</div>'+m+'<ul class="items" id="items">'+items+'</ul>'+
       '<div class="sum" data-say="'+amt(total()).join(" ")+'" data-fb="'+esc(fmt(total()))+'"><span>'+t.sum+'</span><span>'+esc(fmt(total()))+'</span></div>');
     const it = $("items"); it.scrollTop = it.scrollHeight;
+  }else if(S.mode==="detective"){
+    const td = t.det, n = S.detCount||0, r = rankOf(n), next = LEVELS[r+1];
+    const pct = next ? Math.round((n - LEVELS[r]) / (next - LEVELS[r]) * 100) : 100;
+    const log = (S.detLog||[]).filter(c=>REAL[c] && REAL[c].info);
+    const withSugar = log.filter(c=>REAL[c].info.n.sugars!=null);
+    const best = withSugar.length>=2 ? withSugar.slice().sort((a,b)=>REAL[a].info.n.sugars-REAL[b].info.n.sugars)[0] : null;
+    const items = log.length ? log.map(c=>{ const i = REAL[c].info, v = verdict(i), cb = cubesOf(i);
+      return '<li class="'+(det && det.code===c?"new":"")+'" data-act="detOpen" data-code="'+c+'" style="cursor:pointer"><span class="e">'+pic(c)+'</span><span class="n">'+esc(pname(c))+'</span><span class="p">'+td.v[v].split(" ")[0]+(cb!=null?' '+cb+'🧊':'')+'</span></li>'; }).join("")
+      : '<li class="empty"><span class="ee">🗂️</span><span>'+td.empty+'</span></li>';
+    side.innerHTML = fx('<div class="rhead"><h2>'+td.side+'</h2><span class="rno">🔍</span></div>'+
+      '<div class="rank" data-say="lvl_'+r+'" data-fb="'+esc(td.lvl[r])+'"><b>'+esc(td.lvl[r])+'</b><div class="bar"><i style="width:'+pct+'%"></i></div><span class="small" style="color:#fff">'+(next ? td.rankNext(next-n) : td.rankMax)+'</span></div>'+
+      (best ? '<div class="win">'+td.least+' <b>'+esc(pname(best))+'</b> ('+cubesOf(REAL[best].info)+'🧊)</div>' : '')+
+      '<ul class="items">'+items+'</ul>');
   }else if(S.mode==="clinic"){
     const list = Object.keys(PATIENTS).map(c=>{
       const n = S.healed[c]||0, now = clinic && clinic.patient===c;
@@ -995,7 +1281,7 @@ const ticketLines = snap => snap.map(c=>'<div><span>'+pic(c)+' '+esc(pname(c))+'
 
 /* ================= Modes ================= */
 function setMode(m, talk){
-  if(!["shop","clinic","treasure"].includes(m)) return;
+  if(!["shop","clinic","treasure","detective"].includes(m)) return;
   if(!$("recOv").hidden) closeTicket();
   S.mode = m; save(); pending = null;
   $("modes").innerHTML = fx(modeButtons()); render(); view(modeIdleView());
@@ -1027,10 +1313,12 @@ function handle(raw){
   if(act && act.startsWith("m:")){ setMode(act.slice(2)); return; }
 
   // cards from another mode switch to it automatically
-  if(isProduct(code) || isEAN(code) || moneyCard(code) || act==="undo" || act==="mission" || act==="bonus" || act==="balance"){ if(S.mode!=="shop") setMode("shop", false); }
+  if(isEAN(code) && S.mode==="detective"){ /* stay: the detective examines real products */ }
+  else if(isProduct(code) || isEAN(code) || moneyCard(code) || act==="undo" || act==="mission" || act==="bonus" || act==="balance"){ if(S.mode!=="shop") setMode("shop", false); }
   if(PATIENTS[code] || MEDS[code]){ if(S.mode!=="clinic") setMode("clinic", false); }
   if(SPOTS[code]){ if(S.mode!=="treasure") setMode("treasure", false); }
 
+  if(S.mode==="detective") return handleDetective(code, act);
   if(S.mode==="clinic") return handleClinic(code, act);
   if(S.mode==="treasure") return handleTreasure(code, act);
   handleShop(code, act);
@@ -1208,6 +1496,10 @@ document.addEventListener("click", e=>{
   else if(a==="huntStart" || a==="huntAgain") startHunt();
   else if(a==="huntHint" && hunt){ hunt.hint = true; view(V.huntClue, ""); }
   else if(a==="huntParents" && hunt){ hunt.parents = !hunt.parents; view(V.huntClue, ""); }
+  else if(a==="guess") pickGuess(+b.dataset.n);
+  else if(a==="reveal" && det && !det.revealed){ det.revealed = true; view(V.detCard); revealSpeech(REAL[det.code], null); }
+  else if(a==="detShop" && det){ const c = det.code; setMode("shop", false); addToCart(c, false); }
+  else if(a==="detOpen"){ const c = b.dataset.code; if(REAL[c] && REAL[c].info){ det = {code:c, revealed:true, guess:makeGuess(REAL[c].info), picked:null}; SFX.soft(); render(); view(V.detCard); revealSpeech(REAL[c], null); } }
   b.blur && b.blur();
 });
 
@@ -1324,12 +1616,14 @@ function renderPanel(){
   $("simpleChk").checked = !!S.simple; $("simpleChk").disabled = !C().dec;
   $("pReal").textContent = t.pReal; $("realInfo").textContent = t.realInfo; $("exportBtn").textContent = t.exportBtn; $("importTxt").textContent = t.importBtn;
   renderReal();
+  $("pDet").textContent = t.det.pDet; $("guessLbl").textContent = t.det.guessToggle; $("halalLbl").textContent = t.det.halalToggle;
+  $("guessChk").checked = S.detGuess!==false; $("halalChk").checked = S.halal!==false;
   $("limitSel").innerHTML = [0,15,30,45,60].map(n=>'<option value="'+n+'"'+(S.limit===n?" selected":"")+'>'+(n?t.limitMin(n):t.limitOff)+'</option>').join("");
   $("timeInfo").textContent = S.limit && sessionStart ? t.timeLeft(Math.max(0, Math.ceil((S.limit*60000-(Date.now()-sessionStart))/60000))) : t.timeOff;
   $("voiceBtn").textContent = S.voice ? t.voiceOn : t.voiceOff; $("sfxBtn").textContent = S.sfx ? t.sfxOn : t.sfxOff;
   renderVoiceInfo(); renderFamily();
   $("ctrlList").innerHTML = Object.entries(CTRL).map(([c,a])=>'<b>'+c+'</b><span>'+t.ctrl[a]+'</span>').join("")+
-    '<b>9001 / 9002</b><span>'+t.rows.cards+'</span><b>7001–7020</b><span>'+t.rows.bills+'</span><b>71xxxxx–76xxxxx</b><span>'+t.moneyRow+'</span><b>1001–1020</b><span>'+t.rows.prod+'</span><b>EAN-8 / EAN-13</b><span>'+t.realRow+'</span>'+
+    '<b>8104</b><span>🔍 '+t.det.pDet+'</span><b>9001 / 9002</b><span>'+t.rows.cards+'</span><b>7001–7020</b><span>'+t.rows.bills+'</span><b>71xxxxx–76xxxxx</b><span>'+t.moneyRow+'</span><b>1001–1020</b><span>'+t.rows.prod+'</span><b>EAN-8 / EAN-13</b><span>'+t.realRow+'</span>'+
     '<b>3001–3006</b><span>'+t.rows.pat+'</span><b>4001–4008</b><span>'+t.rows.med+'</span><b>5001–5010</b><span>'+t.rows.spot+'</span>';
   $("histList").innerHTML = S.history.length ? S.history.slice(0,10).map(h=>{
     const time = new Date(h.ts).toLocaleTimeString(S.lang+"-u-nu-latn",{hour:"2-digit",minute:"2-digit"});
@@ -1337,7 +1631,7 @@ function renderPanel(){
   }).join("<br>") : t.noTx;
   resetUI(false);
 }
-$("quickCodes").innerHTML = ["1001","1011","9001","7101000","7100200","8030","3017620422003","3001","4002","5001"].map(c=>'<button class="ghost" type="button" data-code="'+c+'">'+c+'</button>').join("");
+$("quickCodes").innerHTML = ["1001","9001","7101000","8030","8104","3017620422003","4008400401621","3001","5001"].map(c=>'<button class="ghost" type="button" data-code="'+c+'">'+c+'</button>').join("");
 $("quickCodes").addEventListener("click", e=>{ const c = e.target.dataset && e.target.dataset.code; if(c){ closePanel(); if(!$("startOv").hidden) startGame(); handle(c); } });
 function openPanel(){ renderPanel(); $("panelOv").hidden = false; }
 function holdToOpen(btn, wrap){
@@ -1404,6 +1698,8 @@ function setCurrency(nc){
   S.currency = nc; cart = []; cash = 0; mission = null; pending = null; save();
   render(); view(modeIdleView()); toast(T().currencySet(n.flag+" "+n.name[S.lang]));
 }
+$("guessChk").onchange = e=>{ S.detGuess = e.target.checked; save(); };
+$("halalChk").onchange = e=>{ S.halal = e.target.checked; save(); if(S.mode==="detective" && det) view(V.detCard, ""); };
 $("curSel").onchange = e=>{ setCurrency(e.target.value); renderPanel(); };
 $("simpleChk").onchange = e=>{ S.simple = e.target.checked; save(); render(); };
 function renderReal(){
