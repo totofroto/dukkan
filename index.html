@@ -1058,23 +1058,49 @@ document.addEventListener("click", e=>{
   b.blur && b.blur();
 });
 
-/* ================= Scanner input: HID keyboard, digits then Enter ================= */
-let buf = "", lastKey = 0;
-document.addEventListener("keydown", e=>{
-  const tag = (e.target && e.target.tagName) || "";
-  if(tag==="INPUT" || tag==="TEXTAREA" || tag==="SELECT") return;
-  if(e.metaKey || e.ctrlKey || e.altKey) return;
+/* ================= Scanner input =================
+   Works whether or not the scanner sends Enter (Zebra's default is "data as is", no suffix):
+   digits are collected and committed on Enter/Tab OR after a short pause.
+   A hidden input (inputmode=none, no soft keyboard) catches keys that Android delivers
+   as IME input ("Unidentified"/229) instead of normal key events. */
+let buf = "", lastKey = 0, commitT = null, lastRaw = "";
+const DIGITS = "0123456789", AR_D = "٠١٢٣٤٥٦٧٨٩", FA_D = "۰۱۲۳۴۵۶۷۸۹";
+function toDigit(ch){ if(DIGITS.includes(ch)) return ch; let i = AR_D.indexOf(ch); if(i>=0) return String(i); i = FA_D.indexOf(ch); return i>=0 ? String(i) : ""; }
+function commit(){
+  clearTimeout(commitT); commitT = null;
+  const c = buf; buf = "";
+  if(c.length < 4) return;
+  lastRaw = c; noteScan();
+  if(closed) return;
+  if(!$("startOv").hidden) startGame();
+  if(!$("panelOv").hidden) closePanel();
+  handle(c);
+}
+function pushDigits(str){
   const now = Date.now(); if(now - lastKey > 800) buf = ""; lastKey = now;
-  if(e.key==="Enter" || e.key==="Tab"){
-    if(!buf) return;
-    e.preventDefault(); const c = buf; buf = "";
-    if(closed) return;
-    if(!$("startOv").hidden) startGame();
-    if(!$("panelOv").hidden) closePanel();
-    handle(c); return;
-  }
-  if(e.key && e.key.length===1 && /[0-9٠-٩۰-۹]/.test(e.key)){ buf += e.key; e.preventDefault(); }
-});
+  for(const ch of str){ const d = toDigit(ch); if(d) buf += d; }
+  clearTimeout(commitT); commitT = setTimeout(commit, 180);
+}
+function inPanelField(t){ return t && t !== scanIn && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName); }
+document.addEventListener("keydown", e=>{
+  if(inPanelField(e.target)) return;
+  if(e.metaKey || e.ctrlKey || e.altKey) return;
+  if(e.key==="Enter" || e.key==="Tab" || e.keyCode===13){ if(buf){ e.preventDefault(); commit(); } return; }
+  let ch = (e.key && e.key.length===1) ? e.key : "";
+  if(!toDigit(ch) && e.code){ const m = /^(?:Digit|Numpad)(\d)$/.exec(e.code); if(m) ch = m[1]; }
+  if(toDigit(ch)){ e.preventDefault(); pushDigits(ch); }
+}, true);
+/* hidden catcher for IME-delivered keystrokes */
+const scanIn = document.createElement("input");
+scanIn.setAttribute("inputmode","none"); scanIn.setAttribute("autocomplete","off"); scanIn.setAttribute("aria-hidden","true"); scanIn.tabIndex = -1;
+scanIn.style.cssText = "position:fixed;left:0;bottom:0;width:1px;height:1px;opacity:0;border:0;padding:0;pointer-events:none";
+document.body.appendChild(scanIn);
+scanIn.addEventListener("input", ()=>{ const v = scanIn.value; scanIn.value = ""; if(v) pushDigits(v); });
+function focusScan(){ if($("panelOv").hidden && document.activeElement !== scanIn){ try{ scanIn.focus({preventScroll:true}); }catch(e){} } }
+document.addEventListener("pointerup", ()=>setTimeout(focusScan, 0));
+scanIn.addEventListener("blur", ()=>setTimeout(focusScan, 300));
+let scanFlashT = null;
+function noteScan(){ const d = document.querySelector(".sign"); if(d){ d.classList.remove("said"); void d.offsetWidth; d.classList.add("said"); } }
 
 /* ================= Confetti (stars + ribbons) ================= */
 const fxc = $("fx"), ctx = fxc.getContext("2d"); let parts=[], raf=null;
@@ -1101,7 +1127,7 @@ async function keepAwake(){ try{ if("wakeLock" in navigator) wake = await naviga
 document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible" && $("startOv").hidden) keepAwake(); });
 function startGame(){
   if($("startOv").hidden) return;
-  $("startOv").hidden = true; audio(); SFX.soft(); keepAwake(); sessionStart = Date.now(); speak(["welcome"], T().say.welcome); warmVoices();
+  $("startOv").hidden = true; focusScan(); audio(); SFX.soft(); keepAwake(); sessionStart = Date.now(); speak(["welcome"], T().say.welcome); warmVoices();
   if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
 }
 function checkClosing(){
@@ -1133,7 +1159,7 @@ function renderVoiceInfo(){
 }
 function renderPanel(){
   const t = T();
-  $("pTitle").textContent=t.pTitle; $("pTest").textContent=t.pTest; $("manualBtn").textContent=t.scan; $("pBal").textContent=t.pBal; $("saveBal").textContent=t.saveBal;
+  $("pTitle").textContent=t.pTitle; $("pTest").textContent=t.pTest+(lastRaw?"  ·  ⌁ "+lastRaw:""); $("manualBtn").textContent=t.scan; $("pBal").textContent=t.pBal; $("saveBal").textContent=t.saveBal;
   $("pTime").textContent=t.pTime; $("reopenBtn").textContent=t.reopen;
   $("pSound").textContent=t.pSound; $("pCodes").textContent=t.pCodes; $("pHist").textContent=t.pHist; $("closePanel").textContent=t.back;
   $("lbl9001").textContent = kname("9001"); $("lbl9002").textContent = kname("9002");
@@ -1198,7 +1224,7 @@ $("famList").addEventListener("click", async e=>{
     setTimeout(()=>{ if(recState && recState.rec===rec) rec.stop(); }, 8000);
   }catch(err){ recState = null; toast(T().micNo); renderFamily(); }
 });
-function closePanel(){ $("panelOv").hidden = true; if(document.activeElement && document.activeElement.blur) document.activeElement.blur(); }
+function closePanel(){ $("panelOv").hidden = true; if(document.activeElement && document.activeElement.blur) document.activeElement.blur(); setTimeout(focusScan, 50); }
 $("closePanel").onclick = closePanel;
 $("manualBtn").onclick = ()=>{ const v = $("manualCode").value; $("manualCode").value = ""; closePanel(); if(!$("startOv").hidden) startGame(); handle(v); };
 $("manualCode").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); $("manualBtn").click(); } });
