@@ -12,3 +12,8 @@ Barcode pretend-play for the Zebra DS2278 (HID keyboard mode): shop & bank, clin
 - 3D icons: [Microsoft Fluent Emoji](https://github.com/microsoft/fluentui-emoji) (MIT) in `fx/`.
 - Offline: `sw.js` caches the game, icons and voices.
 - Parents' panel opens with a long press on ⚙︎.
+
+## v6 — real money & real products
+- Currencies: EUR, USD, GBP, LYD, SAR, AED (+ the original stars). Fixed play rates; "simple prices" option rounds to whole units.
+- Money cards: `7` + currency digit (1 EUR, 2 USD, 3 GBP, 4 LYD, 5 SAR, 6 AED) + value in hundredths (5 digits). Print `kit/money-kit-duplex.pdf`.
+- Real products: scan any EAN-8/EAN-13 → looked up on Open Food Facts / Open Products Facts → stored locally (IndexedDB `catalog`, schema 1). Edit names/prices, back up and restore as JSON in the parents' panel.

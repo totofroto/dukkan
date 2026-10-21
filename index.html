@@ -208,6 +208,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .codes{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:.92rem}
 .codes b{font-variant-numeric:tabular-nums;direction:ltr;text-align:start;white-space:nowrap}
 .toast{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));inset-inline:0;margin-inline:auto;width:max-content;max-width:90%;background:var(--ink);color:#fff;padding:10px 18px;border-radius:14px;z-index:30}
+img.fx.real{border-radius:18%;background:#fff;object-fit:contain;box-shadow:0 6px 18px #2A1B4A22}
 img.fx{width:1em;height:1em;object-fit:contain;vertical-align:-.14em;display:inline-block;-webkit-user-drag:none;user-select:none}
 .big-emoji img.fx,.mid-emoji img.fx{vertical-align:middle;filter:drop-shadow(0 14px 14px #2A1B4A30)}
 .modes .me img.fx{width:1.15em;height:1.15em}
@@ -215,6 +216,10 @@ img.fx{width:1em;height:1em;object-fit:contain;vertical-align:-.14em;display:inl
 .gearwrap svg{position:absolute;inset:-3px;width:calc(100% + 6px);height:calc(100% + 6px);pointer-events:none;rotate:-90deg}
 .gearwrap circle{fill:none;stroke:var(--saffron);stroke-width:4;stroke-dasharray:151;stroke-dashoffset:151;stroke-linecap:round}
 .gearwrap.holding circle{transition:stroke-dashoffset 1.1s linear;stroke-dashoffset:0}
+.realrow{display:grid;grid-template-columns:40px minmax(0,1fr) 6.5rem auto;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line)}
+.realrow img,.realrow .ri{width:40px;height:40px;border-radius:8px;object-fit:contain;background:#fff;font-size:28px;display:grid;place-items:center}
+.realrow input{font:inherit;padding:6px 8px;border:2px solid var(--line);border-radius:10px;min-width:0;width:100%;color:var(--ink);background:var(--paper)}
+.realrow .code{font-size:.72rem;color:var(--ink-soft);direction:ltr}
 .famrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line)}
 .famrow .ft{font-size:.92rem;line-height:1.4}
 .famrow .ft small{display:block;color:var(--ok);font-size:.78rem}
@@ -309,6 +314,12 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:25;width:100%;heigh
       <div class="row" id="quickCodes"></div>
     </section>
     <section>
+      <h4 id="pMoney"></h4>
+      <div class="row"><select id="curSel"></select></div>
+      <label class="row"><input type="checkbox" id="simpleChk" style="width:auto"> <span id="simpleLbl"></span></label>
+      <div class="small" id="rateNote"></div>
+    </section>
+    <section>
       <h4 id="pBal"></h4>
       <div class="row"><label for="bal9001" id="lbl9001"></label><input id="bal9001" type="number" min="0" step="1"></div>
       <div class="row"><label for="bal9002" id="lbl9002"></label><input id="bal9002" type="number" min="0" step="1"></div>
@@ -323,6 +334,12 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:25;width:100%;heigh
       <h4 id="pSound"></h4>
       <div class="row"><button class="ghost" id="voiceBtn" type="button"></button><button class="ghost" id="sfxBtn" type="button"></button></div>
       <div class="small" id="voiceInfo"></div>
+    </section>
+    <section>
+      <h4 id="pReal"></h4>
+      <div class="small" id="realInfo"></div>
+      <div id="realList"></div>
+      <div class="row"><button class="ghost" id="exportBtn" type="button"></button><label class="ghost" id="importLbl" style="cursor:pointer"><span id="importTxt"></span><input type="file" id="importFile" accept="application/json,.json" hidden></label></div>
     </section>
     <section>
       <h4 id="pFamily"></h4>
@@ -346,15 +363,15 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:25;width:100%;heigh
 
 <script>
 /* ================= Catalogue (codes match the print kit) ================= */
-// [emoji, price, ar, en, de]
+// [emoji, price in stars, ar, en, de, base price in euro cents]
 const PRODUCTS = {
-  "1001":["🍎",2,"تفاح","Apples","Äpfel"], "1002":["🍌",2,"موز","Bananas","Bananen"], "1003":["🍓",4,"فراولة","Strawberries","Erdbeeren"],
-  "1004":["🍉",6,"بطيخ","Watermelon","Wassermelone"], "1005":["🥕",1,"جزر","Carrots","Karotten"], "1006":["🥛",3,"حليب","Milk","Milch"],
-  "1007":["🧃",2,"عصير","Juice","Saft"], "1008":["🍞",1,"خبز","Bread","Brot"], "1009":["🧀",5,"جبنة","Cheese","Käse"],
-  "1010":["🥚",4,"بيض","Eggs","Eier"], "1011":["🍫",3,"شوكولاتة","Chocolate","Schokolade"], "1012":["🍪",2,"بسكويت","Cookies","Kekse"],
-  "1013":["🍦",4,"آيس كريم","Ice cream","Eis"], "1014":["🍕",9,"بيتزا","Pizza","Pizza"], "1015":["🧸",15,"دبدوب","Teddy bear","Teddybär"],
-  "1016":["📚",8,"كتاب قصص","Storybook","Märchenbuch"], "1017":["🖍️",6,"ألوان","Crayons","Buntstifte"], "1018":["🎈",1,"بالونة","Balloon","Luftballon"],
-  "1019":["🍯",7,"عسل","Honey","Honig"], "1020":["🫒",5,"زيتون","Olives","Oliven"]
+  "1001":["🍎",2,"تفاح","Apples","Äpfel",150], "1002":["🍌",2,"موز","Bananas","Bananen",120], "1003":["🍓",4,"فراولة","Strawberries","Erdbeeren",250],
+  "1004":["🍉",6,"بطيخ","Watermelon","Wassermelone",400], "1005":["🥕",1,"جزر","Carrots","Karotten",80], "1006":["🥛",3,"حليب","Milk","Milch",110],
+  "1007":["🧃",2,"عصير","Juice","Saft",150], "1008":["🍞",1,"خبز","Bread","Brot",180], "1009":["🧀",5,"جبنة","Cheese","Käse",250],
+  "1010":["🥚",4,"بيض","Eggs","Eier",220], "1011":["🍫",3,"شوكولاتة","Chocolate","Schokolade",130], "1012":["🍪",2,"بسكويت","Cookies","Kekse",160],
+  "1013":["🍦",4,"آيس كريم","Ice cream","Eis",200], "1014":["🍕",9,"بيتزا","Pizza","Pizza",350], "1015":["🧸",15,"دبدوب","Teddy bear","Teddybär",1200],
+  "1016":["📚",8,"كتاب قصص","Storybook","Märchenbuch",800], "1017":["🖍️",6,"ألوان","Crayons","Buntstifte",300], "1018":["🎈",1,"بالونة","Balloon","Luftballon",50],
+  "1019":["🍯",7,"عسل","Honey","Honig",450], "1020":["🫒",5,"زيتون","Olives","Oliven",250]
 };
 // [emoji, ar, en, de]
 const PATIENTS = {
@@ -392,7 +409,58 @@ const LANG_IDX = {ar:0,en:1,de:2};
 const BILLS = {"7001":1,"7002":2,"7005":5,"7010":10,"7020":20};
 const KIDS = {"9001":{cls:"f",name:{ar:"فاطمة",en:"Fatima",de:"Fatima"}}, "9002":{cls:"s",name:{ar:"سماء",en:"Sama",de:"Sama"}}};
 const CTRL = {"8001":"undo","8002":"clear","8010":"bonus","8020":"balance","8030":"mission","8101":"m:shop","8102":"m:clinic","8103":"m:treasure"};
-const START_BALANCE = 50, BONUS = 10, MISSION_BONUS = 3;
+/* ================= Money =================
+   Amounts are integers in the currency's smallest unit (cents for EUR/USD/GBP, whole units otherwise).
+   Money cards: 7 · currency digit · value in hundredths (5 digits), e.g. 7101000 = 10 €, 7100050 = 0.50 €.
+   Rates are fixed play rates (units per 1 €), not live exchange rates. */
+const CUR = {
+  STAR:{dec:0, rate:2,    start:50,   bonus:10,  mission:3,  flag:"⭐", sym:{ar:"★",en:"★",de:"★"}, name:{ar:"نجوم",en:"Stars",de:"Sterne"}},
+  EUR: {dec:2, rate:1,    start:2000, bonus:200, mission:50, sub:"cent",  d:1, flag:"🇪🇺", sym:{ar:"€",en:"€",de:"€"}, name:{ar:"يورو",en:"Euro",de:"Euro"}},
+  USD: {dec:2, rate:1.1,  start:2000, bonus:200, mission:50, sub:"cent",  d:2, flag:"🇺🇸", sym:{ar:"$",en:"$",de:"$"}, name:{ar:"دولار أمريكي",en:"US dollar",de:"US-Dollar"}},
+  GBP: {dec:2, rate:0.85, start:1500, bonus:200, mission:50, sub:"penny", d:3, flag:"🇬🇧", sym:{ar:"£",en:"£",de:"£"}, name:{ar:"جنيه إسترليني",en:"British pound",de:"Britisches Pfund"}},
+  LYD: {dec:0, rate:6,    start:100,  bonus:10,  mission:3,  d:4, flag:"🇱🇾", sym:{ar:"د.ل",en:"LD",de:"LD"}, name:{ar:"دينار ليبي",en:"Libyan dinar",de:"Libyscher Dinar"}},
+  SAR: {dec:0, rate:4.1,  start:80,   bonus:10,  mission:3,  d:5, flag:"🇸🇦", sym:{ar:"ر.س",en:"SAR",de:"SAR"}, name:{ar:"ريال سعودي",en:"Saudi riyal",de:"Saudi-Riyal"}},
+  AED: {dec:0, rate:4,    start:80,   bonus:10,  mission:3,  d:6, flag:"🇦🇪", sym:{ar:"د.إ",en:"AED",de:"AED"}, name:{ar:"درهم إماراتي",en:"UAE dirham",de:"VAE-Dirham"}}
+};
+const C = (cur) => CUR[cur || S.currency] || CUR.EUR;
+function moneyCard(code){
+  if(BILLS[code]) return {cur:"STAR", v:BILLS[code]};
+  const m = /^7([1-6])(\d{5})$/.exec(code); if(!m) return null;
+  const cur = Object.keys(CUR).find(k=>CUR[k].d===+m[1]); if(!cur) return null;
+  const h = +m[2]; return {cur, v: CUR[cur].dec ? h : Math.round(h/100)};
+}
+function fmtNum(v, cur){ const c = C(cur); if(!c.dec) return String(v); const s = (v%100 ? (v/100).toFixed(2) : String(v/100)); return S.lang==="de" ? s.replace(".", ",") : s; }
+function fmt(v, cur){ cur = cur || S.currency; const c = C(cur); if(cur==="STAR") return v+" ★"; const sy = c.sym[S.lang], n = fmtNum(v, cur);
+  return (S.lang==="en" && c.dec) ? (v<0?"-":"")+sy+fmtNum(Math.abs(v), cur) : n+" "+sy; }
+function priceFromBase(base){
+  if(S.currency==="STAR") return Math.max(1, Math.round(base/50));
+  const c = C(), major = base/100*c.rate;
+  if(c.dec){ const step = S.simple ? 100 : 10; return Math.max(step, Math.round(major*100/step)*step); }
+  return Math.max(1, Math.round(major));
+}
+function baseFromPrice(v){ const c = C(); if(S.currency==="STAR") return v*50; const major = c.dec ? v/100 : v; return Math.round(major/c.rate*100); }
+/* spoken amounts → voice-clip tokens (null = no clips, use device voice) */
+function numToks(n){ if(n<100) return ["num_"+n]; const h=Math.floor(n/100)*100, r=n%100; return r ? ["hund_"+h, "num_"+r] : ["hund_"+h]; }
+function countToks(n, u, wa){
+  if(S.lang!=="ar") return n===1 ? [u+"_1"] : numToks(n).concat([u+"_pl"]);
+  if(n===0) return ["num_0", u+"_gen"];
+  if(n===1) return [u+(wa?"_1w":"_1")];
+  if(n===2) return [u+(wa?"_2w":"_2")];
+  const pf = wa ? "wnum_" : "num_";
+  if(n<=10) return [pf+n, u+"_pl"];
+  if(n<100) return [pf+n, u+"_acc"];
+  const h = Math.floor(n/100)*100, r = n%100;
+  if(r===0) return [h===200 ? "hund_200c" : "hund_"+h, u+"_gen"];
+  return ["hund_"+h, "wnum_"+r, (r>=3 && r<=10) ? u+"_pl" : u+"_acc"];
+}
+function amt(v){
+  if(S.currency==="STAR") return ["n_"+v];
+  const c = C(), M = c.dec ? Math.floor(v/100) : v, m = c.dec ? v%100 : 0;
+  if(v<0 || M>999) return [null];
+  const major = (M>0 || m===0) ? countToks(M, "u_"+S.currency, false) : [];
+  const minor = m>0 ? countToks(m, "u_"+c.sub, M>0) : [];
+  return major.concat(minor);
+}
 const KEY = "dukkan_fs_v3";
 
 /* ================= Languages ================= */
@@ -403,22 +471,22 @@ const L = {
   stars:n=> n===1?"نجمة واحدة": n===2?"نجمتان": (n>=3&&n<=10)? n+" نجوم" : n+" نجمة",
   items:n=> n===1?"منتج واحد": n===2?"منتجان": (n>=3&&n<=10)? n+" منتجات": n+" منتجاً",
   total:"المجموع", receipt:"الفاتورة", sum:"الإجمالي",
-  cashLine:(c,r)=>"نقداً "+c+" ★ · باقي "+r+" ★",
+  cashLine:(c,r)=>"نقداً "+fmt(c)+" · باقي "+fmt(r),
   emptyBill:"الفاتورة فارغة", emptyBillHint:"كل منتج تمسحينه يظهر هنا",
   idle:"امسحي أول منتج لتبدأ الفاتورة",
   startTitle:"الدكان مفتوح!", startText:"دكان وعيادة وخريطة كنز. امسحي البطاقات بالماسح وابدئي اللعب.", startBtn:"افتحي الدكان",
   startNote:"لا يوجد ماسح؟ اكتب الكود يدوياً من لوحة الأهل ⚙︎",
   paidCard:"تم الدفع!", paidCash:"تم الدفع نقداً!", cardOf:n=>"بطاقة "+n, before:"الرصيد قبل", after:"الرصيد الآن",
   received:"المستلم", change:"الباقي", giveChange:x=>"أعطي الزبونة الباقي: "+x, exact:"المبلغ مضبوط تماماً 👌", newBill:"فاتورة جديدة",
-  recv:v=>"استلمت "+v+" ★", left:r=>"باقي "+r+" ★ للدفع",
+  recv:v=>"استلمت "+fmt(v), left:r=>"باقي "+fmt(r)+" للدفع",
   unknown:c=>"كود غير معروف: "+c, payFirst:"أكملي الدفع أولاً", cashStarted:"بدأ الدفع نقداً — أكملي بالنقود",
-  notEnough:(n,m)=>"رصيد "+n+" لا يكفي — ينقص "+m+" ★",
+  notEnough:(n,m)=>"رصيد "+n+" لا يكفي — ينقص "+fmt(m),
   bonusFor:n=>"مكافأة لـ"+n, balanceOf:n=>"رصيد "+n, removed:n=>"حذفنا "+n, nothingToUndo:"لا يوجد ما يُحذف", noUndoPaying:"لا يمكن الحذف أثناء الدفع",
   bonusTitle:"مكافأة!", balanceTitle:"كشف حساب", scanCard:"امسحي بطاقة البنك الآن",
   pendBonus:"⭐ امسحي بطاقة من تستحق المكافأة", pendBalance:"🔍 امسحي البطاقة لعرض الرصيد",
   noTx:"لا توجد عمليات بعد", txBonus:"مكافأة", txCash:"نقداً", txMission:"قائمة التسوق",
   missionTitle:"قائمة التسوق", missionNew:"قائمة جديدة", missionHint:"اشتري هذه الأشياء الثلاثة ثم ادفعي ببطاقتك",
-  missionDone:"اكتملت القائمة! ادفعي ببطاقتك لتربحي "+MISSION_BONUS+" ★", missionBonus:"مكافأة المتسوّقة الذكية", missionStart:"🎯 قائمة تسوق",
+  missionDone:"اكتملت القائمة! ادفعي ببطاقتك لتربحي مكافأة", missionBonus:"مكافأة المتسوّقة الذكية", missionStart:"🎯 قائمة تسوق",
   clinic:{side:"سجل المرضى", healedToday:"شُفي اليوم", idle:"امسحي سوار المريض لتبدئي الفحص", diag:"التشخيص",
     needs:"ماذا يحتاج المريض؟ امسحي العلاج الصحيح", needPatient:"امسحي سوار المريض أولاً", wrong:(m,a)=>m+" لا يفيد في: "+a, already:"هذا موجود بالفعل",
     healed:n=>n+" شُفي!", hint:"💡 تلميح", sticker:n=>"🩷 × "+n, none:"لا مرضى بعد"},
@@ -428,6 +496,7 @@ const L = {
   ctrl:{undo:"↩️ حذف آخر منتج", clear:"🧹 فاتورة جديدة / إعادة", bonus:"⭐ مكافأة +10 ثم امسح البطاقة", balance:"🔍 كشف حساب ثم امسح البطاقة",
         mission:"🎯 قائمة تسوق جديدة", "m:shop":"🛒 وضع الدكان", "m:clinic":"🏥 وضع العيادة", "m:treasure":"🗺️ وضع الكنز"},
   holdHint:"اضغط مطولاً على ⚙︎ لفتح لوحة الأهل", pFamily:"🎙️ صوت العائلة", famInfo:"سجّل بصوتك أو بصوت ماما. التسجيل يُحفظ على هذا الجهاز فقط ويحلّ محل الصوت الآلي.", famRec:"● سجّل", famStop:"■ أوقف", famPlay:"▶", famDel:"🗑", famHas:"✓ بصوت العائلة", micNo:"الميكروفون غير متاح هنا. افتح اللعبة من رابط GitHub على التابلت.", voiceHuman:n=>"🎧 أصوات بشرية جاهزة ("+n+" مقطعاً)",
+  pMoney:"💶 العملة", simplePrices:"أسعار بسيطة بدون كسور (مناسبة لسماء)", rateNote:"أسعار صرف ثابتة للعب، وليست أسعار السوق.", pReal:"📦 المنتجات الحقيقية", realInfo:"امسحي باركود أي منتج من المطبخ: يُبحث عنه في Open Food Facts ويُضاف للدكان. يمكنك تعديل الاسم والسعر هنا.", noReal:"لا توجد منتجات حقيقية بعد. امسحي باركود علبة من المطبخ.", exportBtn:"⬇️ نسخة احتياطية", importBtn:"⬆️ استعادة", imported:n=>"تمت استعادة "+n+" منتج", searchingTxt:"لحظة، أبحث عن المنتج…", newProd:"منتج جديد!", notCurrency:c=>"هذه "+c+". عملة الدكان اليوم: "+CUR[S.currency].name.ar, currencySet:c=>"العملة الآن: "+c, delBtn:"🗑", moneyRow:"نقود حقيقية: 7 + رقم العملة + القيمة", realRow:"باركود أي منتج حقيقي",
   pTitle:"لوحة الأهل", pTest:"تجربة بدون ماسح", scan:"امسح", pBal:"الأرصدة", saveBal:"حفظ الأرصدة", saved:"تم حفظ الأرصدة", badNum:"اكتب رقماً صحيحاً من 0 فما فوق",
   pTime:"وقت الإغلاق", limitOff:"بدون وقت محدد", limitMin:n=>"يغلق الدكان بعد "+n+" دقيقة", reopen:"افتح الدكان من جديد",
   timeLeft:n=>"باقي "+n+" دقيقة على الإغلاق", timeOff:"لا يوجد وقت إغلاق", reopened:"فُتح الدكان من جديد",
@@ -435,7 +504,7 @@ const L = {
   pSound:"الصوت", voiceOn:"🔊 النطق يعمل", voiceOff:"🔇 النطق متوقف", sfxOn:"🎵 المؤثرات تعمل", sfxOff:"🎵 المؤثرات متوقفة",
   voiceUsing:n=>"الصوت المستخدم: "+n, noVoice:"لا يوجد صوت عربي على هذا الجهاز. ثبّته من إعدادات تحويل النص إلى كلام.", noTTS:"هذا المتصفح لا يدعم النطق.",
   pCodes:"دليل الأكواد", rows:{cards:"بطاقة فاطمة / بطاقة سماء", bills:"النقود (1، 2، 5، 10، 20 نجمة)", prod:"المنتجات", pat:"أساور المرضى", med:"العلاجات", spot:"أماكن الكنز"},
-  pHist:"آخر العمليات", reset:"بدء يوم جديد (تصفير الأرصدة والسجل)", resetAsk:"متأكد؟ تعود الأرصدة إلى "+START_BALANCE+" ويُمسح السجل.", resetYes:"نعم، ابدأ يوماً جديداً", cancel:"إلغاء", resetDone:"بدأ يوم جديد",
+  pHist:"آخر العمليات", reset:"بدء يوم جديد (تصفير الأرصدة والسجل)", resetAsk:"متأكد؟ تعود الأرصدة إلى رصيد البداية ويُمسح السجل.", resetYes:"نعم، ابدأ يوماً جديداً", cancel:"إلغاء", resetDone:"بدأ يوم جديد",
   back:"رجوع للدكان", fs:"ملء الشاشة", fsNo:"ملء الشاشة غير متاح هنا. أضف الصفحة إلى الشاشة الرئيسية.", gear:"لوحة الأهل",
   say:{
    product:(n,p)=>n+"، "+L.ar.stars(p), recv:(v,r)=>"استلمت "+L.ar.stars(v)+"، باقي "+L.ar.stars(r),
@@ -458,22 +527,22 @@ const L = {
   brand:"Fatima & Sama's Shop", modes:{shop:"Shop",clinic:"Clinic",treasure:"Treasure"},
   stars:n=> n===1?"1 star": n+" stars", items:n=> n===1?"1 item": n+" items",
   total:"Total", receipt:"Receipt", sum:"Total",
-  cashLine:(c,r)=>"Cash "+c+" ★ · "+r+" ★ to go",
+  cashLine:(c,r)=>"Cash "+fmt(c)+" · "+fmt(r)+" to go",
   emptyBill:"The receipt is empty", emptyBillHint:"Every item you scan shows up here",
   idle:"Scan the first item to start a receipt",
   startTitle:"The shop is open!", startText:"A shop, a clinic and a treasure map. Scan the cards and start playing.", startBtn:"Open the shop",
   startNote:"No scanner yet? Type a code in the parents' panel ⚙︎",
   paidCard:"Paid!", paidCash:"Paid in cash!", cardOf:n=>n+"'s card", before:"Balance before", after:"Balance now",
   received:"Received", change:"Change", giveChange:x=>"Give back the change: "+x, exact:"Exact amount 👌", newBill:"New receipt",
-  recv:v=>"Got "+v+" ★", left:r=>r+" ★ still to pay",
+  recv:v=>"Got "+fmt(v), left:r=>fmt(r)+" still to pay",
   unknown:c=>"Unknown code: "+c, payFirst:"Finish paying first", cashStarted:"Cash payment started, keep paying with money",
-  notEnough:(n,m)=>n+" needs "+m+" ★ more",
+  notEnough:(n,m)=>n+" needs "+fmt(m)+" more",
   bonusFor:n=>"Bonus for "+n, balanceOf:n=>n+"'s balance", removed:n=>"Removed "+n, nothingToUndo:"Nothing to remove", noUndoPaying:"Can't remove items while paying",
   bonusTitle:"Bonus!", balanceTitle:"Balance check", scanCard:"Scan a bank card now",
   pendBonus:"⭐ Scan the card of who earned the bonus", pendBalance:"🔍 Scan a card to see its balance",
   noTx:"No payments yet", txBonus:"Bonus", txCash:"Cash", txMission:"Shopping list",
   missionTitle:"Shopping list", missionNew:"New list", missionHint:"Buy these three things, then pay with your card",
-  missionDone:"List complete! Pay with your card to win "+MISSION_BONUS+" ★", missionBonus:"Smart shopper bonus", missionStart:"🎯 Shopping list",
+  missionDone:"List complete! Pay with your card to win a bonus", missionBonus:"Smart shopper bonus", missionStart:"🎯 Shopping list",
   clinic:{side:"Patient chart", healedToday:"Healed today", idle:"Scan a patient's wristband to start the check-up", diag:"Diagnosis",
     needs:"What does the patient need? Scan the right treatment", needPatient:"Scan a patient's wristband first", wrong:(m,a)=>m+" won't help with: "+a, already:"Already given",
     healed:n=>n+" is all better!", hint:"💡 Hint", sticker:n=>"🩷 × "+n, none:"No patients yet"},
@@ -483,6 +552,7 @@ const L = {
   ctrl:{undo:"↩️ Remove last item", clear:"🧹 New receipt / restart", bonus:"⭐ Bonus +10, then scan a card", balance:"🔍 Balance check, then scan a card",
         mission:"🎯 New shopping list", "m:shop":"🛒 Shop mode", "m:clinic":"🏥 Clinic mode", "m:treasure":"🗺️ Treasure mode"},
   holdHint:"Press and hold ⚙︎ to open the parents' panel", pFamily:"🎙️ Family voice", famInfo:"Record these lines in your own voice. Recordings stay on this device and replace the built-in voice.", famRec:"● Record", famStop:"■ Stop", famPlay:"▶", famDel:"🗑", famHas:"✓ Family voice", micNo:"The microphone isn't available here. Open the game from its GitHub link on the tablet.", voiceHuman:n=>"🎧 Human voices ready ("+n+" clips)",
+  pMoney:"💶 Currency", simplePrices:"Simple prices without cents (good for Sama)", rateNote:"Fixed play exchange rates, not market rates.", pReal:"📦 Real products", realInfo:"Scan the barcode of anything from the kitchen: it is looked up on Open Food Facts and added to the shop. Edit names and prices here.", noReal:"No real products yet. Scan a barcode from the kitchen.", exportBtn:"⬇️ Back up", importBtn:"⬆️ Restore", imported:n=>n+" products restored", searchingTxt:"One moment, looking this product up…", newProd:"New product!", notCurrency:c=>"That is "+c+". Today the shop uses "+CUR[S.currency].name.en, currencySet:c=>"Currency is now "+c, delBtn:"🗑", moneyRow:"Real money: 7 + currency digit + value", realRow:"Barcode of any real product",
   pTitle:"Parents' panel", pTest:"Try without a scanner", scan:"Scan", pBal:"Balances", saveBal:"Save balances", saved:"Balances saved", badNum:"Enter a whole number, 0 or more",
   pTime:"Closing time", limitOff:"No time limit", limitMin:n=>"Close the shop after "+n+" minutes", reopen:"Reopen the shop",
   timeLeft:n=>n+" minutes until closing", timeOff:"No closing time set", reopened:"Shop reopened",
@@ -490,7 +560,7 @@ const L = {
   pSound:"Sound", voiceOn:"🔊 Voice on", voiceOff:"🔇 Voice off", sfxOn:"🎵 Sound effects on", sfxOff:"🎵 Sound effects off",
   voiceUsing:n=>"Voice in use: "+n, noVoice:"No English voice on this device. Install one in the text-to-speech settings.", noTTS:"This browser can't speak.",
   pCodes:"Code guide", rows:{cards:"Fatima's card / Sama's card", bills:"Money (1, 2, 5, 10, 20 stars)", prod:"Products", pat:"Patient wristbands", med:"Treatments", spot:"Treasure spots"},
-  pHist:"Recent activity", reset:"Start a new day (reset balances and history)", resetAsk:"Sure? Balances go back to "+START_BALANCE+" and history is cleared.", resetYes:"Yes, start a new day", cancel:"Cancel", resetDone:"New day started",
+  pHist:"Recent activity", reset:"Start a new day (reset balances and history)", resetAsk:"Sure? Balances go back to the starting amount and history is cleared.", resetYes:"Yes, start a new day", cancel:"Cancel", resetDone:"New day started",
   back:"Back to the shop", fs:"Full screen", fsNo:"Full screen isn't available here. Add the page to your home screen.", gear:"Parents' panel",
   say:{
    product:(n,p)=>n+", "+L.en.stars(p), recv:(v,r)=>"Got "+L.en.stars(v)+". "+L.en.stars(r)+" to go",
@@ -513,22 +583,22 @@ const L = {
   brand:"Fatimas & Samas Laden", modes:{shop:"Laden",clinic:"Praxis",treasure:"Schatz"},
   stars:n=> n===1?"1 Stern": n+" Sterne", items:n=> n===1?"1 Artikel": n+" Artikel",
   total:"Summe", receipt:"Kassenbon", sum:"Gesamt",
-  cashLine:(c,r)=>"Bar "+c+" ★ · noch "+r+" ★",
+  cashLine:(c,r)=>"Bar "+fmt(c)+" · noch "+fmt(r),
   emptyBill:"Der Kassenbon ist leer", emptyBillHint:"Jeder gescannte Artikel erscheint hier",
   idle:"Scanne den ersten Artikel für einen neuen Bon",
   startTitle:"Der Laden hat geöffnet!", startText:"Ein Laden, eine Arztpraxis und eine Schatzkarte. Scanne die Karten und los geht's.", startBtn:"Laden öffnen",
   startNote:"Noch kein Scanner? Gib einen Code im Elternbereich ⚙︎ ein",
   paidCard:"Bezahlt!", paidCash:"Bar bezahlt!", cardOf:n=>"Karte von "+n, before:"Guthaben vorher", after:"Guthaben jetzt",
   received:"Erhalten", change:"Rückgeld", giveChange:x=>"Gib das Rückgeld zurück: "+x, exact:"Genau passend 👌", newBill:"Neuer Bon",
-  recv:v=>v+" ★ erhalten", left:r=>"noch "+r+" ★ zu zahlen",
+  recv:v=>fmt(v)+" erhalten", left:r=>"noch "+fmt(r)+" zu zahlen",
   unknown:c=>"Unbekannter Code: "+c, payFirst:"Erst fertig bezahlen", cashStarted:"Barzahlung läuft, bitte mit Geld weiterzahlen",
-  notEnough:(n,m)=>n+" fehlen noch "+m+" ★",
+  notEnough:(n,m)=>n+" fehlen noch "+fmt(m),
   bonusFor:n=>"Bonus für "+n, balanceOf:n=>"Guthaben von "+n, removed:n=>n+" entfernt", nothingToUndo:"Nichts zum Entfernen", noUndoPaying:"Beim Bezahlen nicht möglich",
   bonusTitle:"Bonus!", balanceTitle:"Kontostand", scanCard:"Jetzt eine Bankkarte scannen",
   pendBonus:"⭐ Karte von der Person scannen, die den Bonus verdient hat", pendBalance:"🔍 Karte scannen, um das Guthaben zu sehen",
   noTx:"Noch keine Zahlungen", txBonus:"Bonus", txCash:"Bar", txMission:"Einkaufsliste",
   missionTitle:"Einkaufsliste", missionNew:"Neue Liste", missionHint:"Kaufe diese drei Sachen und bezahle mit deiner Karte",
-  missionDone:"Liste komplett! Mit Karte bezahlen und "+MISSION_BONUS+" ★ gewinnen", missionBonus:"Bonus für schlaues Einkaufen", missionStart:"🎯 Einkaufsliste",
+  missionDone:"Liste komplett! Mit Karte bezahlen und Bonus gewinnen", missionBonus:"Bonus für schlaues Einkaufen", missionStart:"🎯 Einkaufsliste",
   clinic:{side:"Patientenakte", healedToday:"Heute geheilt", idle:"Scanne das Armband eines Patienten für die Untersuchung", diag:"Diagnose",
     needs:"Was braucht der Patient? Scanne die richtige Behandlung", needPatient:"Scanne zuerst das Armband eines Patienten", wrong:(m,a)=>m+" hilft nicht bei: "+a, already:"Schon gegeben",
     healed:n=>n+" ist wieder gesund!", hint:"💡 Tipp", sticker:n=>"🩷 × "+n, none:"Noch keine Patienten"},
@@ -538,6 +608,7 @@ const L = {
   ctrl:{undo:"↩️ Letzten Artikel entfernen", clear:"🧹 Neuer Bon / Neustart", bonus:"⭐ Bonus +10, dann Karte scannen", balance:"🔍 Kontostand, dann Karte scannen",
         mission:"🎯 Neue Einkaufsliste", "m:shop":"🛒 Laden", "m:clinic":"🏥 Arztpraxis", "m:treasure":"🗺️ Schatzsuche"},
   holdHint:"⚙︎ lange drücken, um den Elternbereich zu öffnen", pFamily:"🎙️ Familienstimme", famInfo:"Sprich diese Sätze selbst ein. Die Aufnahmen bleiben auf diesem Gerät und ersetzen die eingebaute Stimme.", famRec:"● Aufnehmen", famStop:"■ Stopp", famPlay:"▶", famDel:"🗑", famHas:"✓ Familienstimme", micNo:"Das Mikrofon ist hier nicht verfügbar. Öffne das Spiel über den GitHub-Link auf dem Tablet.", voiceHuman:n=>"🎧 Menschliche Stimmen bereit ("+n+" Clips)",
+  pMoney:"💶 Währung", simplePrices:"Einfache Preise ohne Cent (gut für Sama)", rateNote:"Feste Spielkurse, keine Marktkurse.", pReal:"📦 Echte Produkte", realInfo:"Scanne den Barcode von etwas aus der Küche: Er wird bei Open Food Facts gesucht und kommt in den Laden. Namen und Preise hier ändern.", noReal:"Noch keine echten Produkte. Scanne einen Barcode aus der Küche.", exportBtn:"⬇️ Sichern", importBtn:"⬆️ Wiederherstellen", imported:n=>n+" Produkte wiederhergestellt", searchingTxt:"Moment, ich suche das Produkt…", newProd:"Neues Produkt!", notCurrency:c=>"Das ist "+c+". Heute zahlt man hier mit "+CUR[S.currency].name.de, currencySet:c=>"Währung jetzt: "+c, delBtn:"🗑", moneyRow:"Echtes Spielgeld: 7 + Währungsziffer + Wert", realRow:"Barcode eines echten Produkts",
   pTitle:"Elternbereich", pTest:"Ohne Scanner testen", scan:"Scannen", pBal:"Guthaben", saveBal:"Guthaben speichern", saved:"Guthaben gespeichert", badNum:"Bitte eine ganze Zahl ab 0 eingeben",
   pTime:"Ladenschluss", limitOff:"Keine Zeitgrenze", limitMin:n=>"Laden schließt nach "+n+" Minuten", reopen:"Laden wieder öffnen",
   timeLeft:n=>"Noch "+n+" Minuten bis Ladenschluss", timeOff:"Kein Ladenschluss eingestellt", reopened:"Laden wieder geöffnet",
@@ -545,7 +616,7 @@ const L = {
   pSound:"Ton", voiceOn:"🔊 Sprache an", voiceOff:"🔇 Sprache aus", sfxOn:"🎵 Effekte an", sfxOff:"🎵 Effekte aus",
   voiceUsing:n=>"Verwendete Stimme: "+n, noVoice:"Keine deutsche Stimme auf diesem Gerät. In den Sprachausgabe-Einstellungen installieren.", noTTS:"Dieser Browser kann nicht sprechen.",
   pCodes:"Code-Übersicht", rows:{cards:"Fatimas Karte / Samas Karte", bills:"Geld (1, 2, 5, 10, 20 Sterne)", prod:"Artikel", pat:"Patientenarmbänder", med:"Behandlungen", spot:"Schatz-Verstecke"},
-  pHist:"Letzte Buchungen", reset:"Neuen Tag beginnen (Guthaben und Verlauf zurücksetzen)", resetAsk:"Sicher? Das Guthaben geht auf "+START_BALANCE+" zurück und der Verlauf wird gelöscht.", resetYes:"Ja, neuen Tag beginnen", cancel:"Abbrechen", resetDone:"Neuer Tag begonnen",
+  pHist:"Letzte Buchungen", reset:"Neuen Tag beginnen (Guthaben und Verlauf zurücksetzen)", resetAsk:"Sicher? Das Guthaben geht auf den Startbetrag zurück und der Verlauf wird gelöscht.", resetYes:"Ja, neuen Tag beginnen", cancel:"Abbrechen", resetDone:"Neuer Tag begonnen",
   back:"Zurück zum Laden", fs:"Vollbild", fsNo:"Vollbild ist hier nicht verfügbar. Seite zum Startbildschirm hinzufügen.", gear:"Elternbereich",
   say:{
    product:(n,p)=>n+", "+L.de.stars(p), recv:(v,r)=>L.de.stars(v)+" erhalten. Noch "+L.de.stars(r),
@@ -565,12 +636,16 @@ const L = {
  }
 };
 
+Object.keys(L).forEach(k=>{ const o = L[k].stars; L[k].stars = n => S.currency==="STAR" ? o(n) : fmt(n); });
+
 /* ================= State ================= */
 function today(){ const d=new Date(); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
-function defaults(){ return {balances:{"9001":START_BALANCE,"9002":START_BALANCE}, history:[], voice:true, sfx:true, lang:"ar", receiptNo:1,
+function defaults(){ return {balances:{"9001":CUR.EUR.start,"9002":CUR.EUR.start}, currency:"EUR", simple:false, history:[], voice:true, sfx:true, lang:"ar", receiptNo:1,
   mode:"shop", healed:{}, healedDay:today(), limit:0, clues:5}; }
 let S = defaults();
-try{ const raw = localStorage.getItem(KEY); if(raw) S = Object.assign(defaults(), JSON.parse(raw)); }catch(e){}
+let migrateStars = false;
+try{ const raw = localStorage.getItem(KEY); if(raw){ const old = JSON.parse(raw); if(!old.currency){ old.currency = "STAR"; migrateStars = true; } S = Object.assign(defaults(), old); } }catch(e){}
+if(!CUR[S.currency]) S.currency = "EUR";
 if(!L[S.lang]) S.lang = "ar";
 if(S.healedDay !== today()){ S.healed = {}; S.healedDay = today(); }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
@@ -583,8 +658,23 @@ let sessionStart = null, closed = false;
 const $ = id => document.getElementById(id);
 const T = () => L[S.lang];
 const li = () => LANG_IDX[S.lang];
-const total = () => cart.reduce((a,c)=>a+PRODUCTS[c][1],0);
-const pname = (code, lang) => PRODUCTS[code][2 + LANG_IDX[lang||S.lang]];
+let REAL = {};   // real products from the local catalogue (IndexedDB), keyed by barcode
+const isProduct = c => !!(PRODUCTS[c] || REAL[c]);
+const isEAN = c => /^(\d{8}|\d{12,14})$/.test(c);
+function priceOf(c){ if(PRODUCTS[c]) return S.currency==="STAR" ? PRODUCTS[c][1] : priceFromBase(PRODUCTS[c][5]); return REAL[c] ? priceFromBase(REAL[c].base) : 0; }
+const total = () => cart.reduce((a,c)=>a+priceOf(c),0);
+function pname(code, lang){
+  lang = lang || S.lang;
+  if(PRODUCTS[code]) return PRODUCTS[code][2 + LANG_IDX[lang]];
+  const r = REAL[code]; if(!r) return code;
+  return r.names[lang] || r.names.en || r.names.de || r.names.ar || code;
+}
+const pTok = c => PRODUCTS[c] ? "p_"+c : "t:"+pname(c);
+const pSay = c => PRODUCTS[c] ? "p_"+c : "t:"+encodeURIComponent(pname(c));
+function pic(c){
+  if(PRODUCTS[c]) return PRODUCTS[c][0];
+  const r = REAL[c]; return r && r.img ? '<img class="fx real" src="'+esc(r.img)+'" alt="">' : "📦";
+}
 const patName = c => PATIENTS[c][1+li()];
 const medName = c => MEDS[c][1+li()];
 const spotName = c => SPOTS[c][1+li()];
@@ -648,23 +738,38 @@ function clipBuf(lang, key){
 }
 let speakGen = 0, liveSrc = [];
 function stopSpeech(){ liveSrc.forEach(x=>{ try{ x.stop(); }catch(e){} }); liveSrc = []; try{ speechSynthesis.cancel(); }catch(e){} }
+function ttsPromise(text){
+  return new Promise(res=>{
+    const v = voiceFor(S.lang); if(!v || !text){ res(); return; }
+    try{ const u = new SpeechSynthesisUtterance(text); u.voice=v; u.lang=v.lang; u.rate=.98; u.pitch=1.1;
+      const done = ()=>{ clearTimeout(t); res(); }; const t = setTimeout(done, 1500 + text.length*110);
+      u.onend = done; u.onerror = done; speechSynthesis.speak(u); }catch(e){ res(); }
+  });
+}
 async function speak(tokens, fallback){
   if(!S.voice) return;
   const gen = ++speakGen, lang = S.lang; stopSpeech();
+  if(!tokens || tokens.some(k=>k==null)){ ttsSay(fallback); return; }
   const keys = tokens.filter(k=>!(VM && VM[lang] && VM[lang][k]===""));
-  const famAny = await famHasAny(lang, keys);
+  const clipKeys = keys.filter(k=>!k.startsWith("t:"));
+  const famAny = await famHasAny(lang, clipKeys);
   if(gen!==speakGen) return;
-  if((VM && VM[lang]) || famAny){
-    const bufs = await Promise.all(keys.map(k=>clipBuf(lang,k)));
+  if(!(VM && VM[lang]) && !famAny){ ttsSay(fallback); return; }
+  const parts = await Promise.all(keys.map(k=>k.startsWith("t:") ? Promise.resolve(k.slice(2)) : clipBuf(lang,k)));
+  if(gen!==speakGen) return;
+  if(!parts.every(x=>x)){ ttsSay(fallback); return; }
+  const ac = audio();
+  for(let i=0; i<parts.length; i++){
     if(gen!==speakGen) return;
-    if(bufs.every(Boolean)){
-      const ac = audio(); let t = ac.currentTime + .04;
-      bufs.forEach((b,i)=>{ const src = ac.createBufferSource(); src.buffer = b; const g = ac.createGain(); g.gain.value = 1.15;
-        src.connect(g).connect(ac.destination); src.start(t); liveSrc.push(src); t += b.duration + (i < bufs.length-1 ? .09 : 0); });
-      return;
+    if(typeof parts[i]==="string"){ await ttsPromise(parts[i]); continue; }
+    let t = ac.currentTime + .03, j = i;
+    while(j<parts.length && typeof parts[j]!=="string"){
+      const src = ac.createBufferSource(); src.buffer = parts[j]; const g = ac.createGain(); g.gain.value = 1.15;
+      src.connect(g).connect(ac.destination); src.start(t); liveSrc.push(src); t += parts[j].duration + (j<parts.length-1 ? .09 : 0); j++;
     }
+    await new Promise(r=>setTimeout(r, Math.max(0, (t-ac.currentTime)*1000)));
+    i = j-1;
   }
-  ttsSay(fallback);
 }
 function warmVoices(){
   if(!VM || !VM[S.lang]) return;
@@ -679,7 +784,7 @@ function warmVoices(){
 let famDB = null, famKeysCache = null;
 function famOpen(){
   if(famDB) return famDB;
-  famDB = new Promise((res)=>{ try{ const r = indexedDB.open("dukkan", 1); r.onupgradeneeded = ()=>r.result.createObjectStore("voices"); r.onsuccess = ()=>res(r.result); r.onerror = ()=>res(null); }catch(e){ res(null); } });
+  famDB = new Promise((res)=>{ try{ const r = indexedDB.open("dukkan", 2); r.onupgradeneeded = ()=>{ const db = r.result; if(!db.objectStoreNames.contains("voices")) db.createObjectStore("voices"); if(!db.objectStoreNames.contains("catalog")) db.createObjectStore("catalog", {keyPath:"code"}); }; r.onsuccess = ()=>res(r.result); r.onerror = ()=>res(null); }catch(e){ res(null); } });
   return famDB;
 }
 async function famTx(mode, fn){ const db = await famOpen(); if(!db) return null; return new Promise((res)=>{ try{ const tx = db.transaction("voices", mode); const st = tx.objectStore("voices"); const rq = fn(st); rq.onsuccess = ()=>res(rq.result); rq.onerror = ()=>res(null); }catch(e){ res(null); } }); }
@@ -688,6 +793,38 @@ async function famHasAny(lang, keys){ const k = await famKeys(); return keys.som
 async function famGet(lang, key){ const k = await famKeys(); if(!k.has(lang+"/"+key)) return null; return famTx("readonly", st=>st.get(lang+"/"+key)); }
 async function famSet(lang, key, blob){ await famTx("readwrite", st=>st.put(blob, lang+"/"+key)); (await famKeys()).add(lang+"/"+key); bufCache.delete(lang+"/"+key); }
 async function famDel(lang, key){ await famTx("readwrite", st=>st.delete(lang+"/"+key)); (await famKeys()).delete(lang+"/"+key); bufCache.delete(lang+"/"+key); }
+/* ---- real-product catalogue (local-first; export/import JSON; schema v1) ---- */
+async function catReq(mode, fn){ const db = await famOpen(); if(!db) return null; return new Promise(res=>{ try{ const rq = fn(db.transaction("catalog", mode).objectStore("catalog")); rq.onsuccess = ()=>res(rq.result); rq.onerror = ()=>res(null); }catch(e){ res(null); } }); }
+async function catLoad(){ const all = await catReq("readonly", st=>st.getAll()); REAL = {}; (all||[]).forEach(r=>{ REAL[r.code] = r; }); }
+async function catPut(rec){ REAL[rec.code] = rec; await catReq("readwrite", st=>st.put(rec)); }
+async function catDel(code){ delete REAL[code]; await catReq("readwrite", st=>st.delete(code)); }
+const CAT_PRICE = [["waters",60],["sodas",120],["carbonated",120],["juices",180],["milks",110],["yogurts",80],["cheeses",250],["breads",180],
+  ["chocolates",150],["biscuits",160],["cookies",160],["candies",120],["confectioner",120],["chips",170],["crisps",170],["cereals",300],["pastas",120],
+  ["rices",200],["coffees",500],["teas",250],["fruits",150],["vegetables",120],["ice-creams",300],["frozen",300],["baby",200],["spreads",300],
+  ["sauces",180],["oils",400],["beverages",150],["snacks",150],["cosmetics",300],["shampoos",250]];
+function estimatePrice(tags){ const t = (tags||[]).join(" "); for(const [k,v] of CAT_PRICE) if(t.includes(k)) return v; return 199; }
+async function lookupReal(code){
+  const f = "product_name,product_name_ar,product_name_en,product_name_de,generic_name,brands,quantity,categories_tags,image_front_small_url,image_front_url";
+  for(const host of ["world.openfoodfacts.org","world.openproductsfacts.org","world.openbeautyfacts.org"]){
+    try{ const r = await fetch("https://"+host+"/api/v2/product/"+code+".json?fields="+f); if(!r.ok) continue;
+      const j = await r.json(); if(j && j.status===1 && j.product) return j.product; }catch(e){}
+  }
+  return null;
+}
+async function imgToData(url){
+  try{ const r = await fetch(url); if(!r.ok) return url; const b = await r.blob();
+    return await new Promise(res=>{ const fr = new FileReader(); fr.onload = ()=>res(fr.result); fr.onerror = ()=>res(url); fr.readAsDataURL(b); }); }catch(e){ return url; }
+}
+async function addReal(code){
+  const p = await lookupReal(code);
+  const any = p ? (p.product_name || p.generic_name || p.product_name_en || p.product_name_de || p.product_name_ar || "") : "";
+  const tail = code.slice(-4);
+  const names = { ar: (p && p.product_name_ar) || any || ("منتج "+tail), en: (p && p.product_name_en) || any || ("Product "+tail), de: (p && p.product_name_de) || any || ("Produkt "+tail) };
+  const imgUrl = p && (p.image_front_small_url || p.image_front_url);
+  const rec = { code, schema:1, src: p ? "openfoodfacts" : "manual", names, brand: (p && p.brands) || "", qty: (p && p.quantity) || "",
+    base: estimatePrice(p && p.categories_tags), img: imgUrl ? await imgToData(imgUrl) : "", added: Date.now() };
+  await catPut(rec); return rec;
+}
 const FAMILY_KEYS = ["welcome","paid_9001","paid_9002","bonus_9001","bonus_9002","healedPre","found","treasure","closed"];
 
 /* ================= 3D icons (Microsoft Fluent Emoji, MIT) with emoji fallback ================= */
@@ -707,12 +844,14 @@ function drawView(cls){
 }
 const V = {
   idle: ()=>'<div class="big-emoji">🛒</div><p class="hint">'+T().idle+'</p><div class="choice"><button class="pill" type="button" data-act="mission">'+T().missionStart+'</button></div>',
-  product: code => ()=>{
-    const [e,p] = PRODUCTS[code];
-    const others = Object.keys(LANG_IDX).filter(l=>l!==S.lang).map(l=>'<span><b>'+L[l].label+'</b>'+esc(pname(code,l))+'</span>').join("");
-    return '<div class="big-emoji" data-say="p_'+code+' n_'+p+'" data-fb="'+esc(pname(code))+'">'+e+'</div><p class="big-name" data-say="p_'+code+' n_'+p+'" data-fb="'+esc(pname(code))+'">'+esc(pname(code))+'</p><div class="also">'+others+'</div><div class="tag" data-say="n_'+p+'" data-fb="'+p+'">'+p+' <span class="s">★</span></div>';
+  product: (code, fresh) => ()=>{
+    const p = priceOf(code), say = [pSay(code)].concat(amt(p)).join(" "), fb = esc(pname(code)+" "+fmt(p));
+    const names = Object.keys(LANG_IDX).filter(l=>l!==S.lang).map(l=>pname(code,l)).filter((n,i,a)=>n && n!==pname(code) && a.indexOf(n)===i);
+    const others = PRODUCTS[code] ? Object.keys(LANG_IDX).filter(l=>l!==S.lang).map(l=>'<span><b>'+L[l].label+'</b>'+esc(pname(code,l))+'</span>').join("")
+      : (REAL[code] && REAL[code].brand ? '<span>'+esc(REAL[code].brand)+(REAL[code].qty?' · '+esc(REAL[code].qty):'')+'</span>' : '');
+    return (fresh?'<p class="hint">✨ '+T().newProd+'</p>':'')+'<div class="big-emoji" data-say="'+say+'" data-fb="'+fb+'">'+pic(code)+'</div><p class="big-name" data-say="'+say+'" data-fb="'+fb+'">'+esc(pname(code))+'</p><div class="also">'+others+'</div><div class="tag" data-say="'+amt(p).join(" ")+'" data-fb="'+esc(fmt(p))+'">'+esc(fmt(p))+'</div>';
   },
-  msg: (emoji, title, hint, tag) => ()=>'<div class="big-emoji">'+emoji+'</div><p class="big-name">'+title()+'</p>'+(hint?'<p class="hint">'+hint()+'</p>':'')+(tag?'<div class="tag ok">'+tag()+' <span class="s">★</span></div>':''),
+  msg: (emoji, title, hint, tag) => ()=>'<div class="big-emoji">'+emoji+'</div><p class="big-name">'+title()+'</p>'+(hint?'<p class="hint">'+hint()+'</p>':'')+(tag?'<div class="tag ok">'+esc(tag())+'</div>':''),
   clinicIdle: ()=>'<div class="big-emoji">🏥</div><p class="hint">'+T().clinic.idle+'</p>',
   clinicCase: ()=>{
     const c = clinic, t = T().clinic, [pe] = PATIENTS[c.patient];
@@ -776,8 +915,8 @@ function render(){
   // display
   if(S.mode==="shop"){
     const v = total();
-    $("lcdLabel").textContent = t.total; $("lcdValue").textContent = v; $("lcdUnit").textContent = "★";
-    const lc = document.querySelector(".lcd"); lc.dataset.say = "n_"+v; lc.dataset.fb = t.stars(v);
+    $("lcdLabel").textContent = t.total; $("lcdValue").textContent = S.currency==="STAR" ? v : fmtNum(v); $("lcdUnit").textContent = C().sym[S.lang];
+    const lc = document.querySelector(".lcd"); lc.dataset.say = amt(v).join(" "); lc.dataset.fb = fmt(v);
     $("lcdSub").textContent = cash>0 ? t.cashLine(cash, Math.max(0,v-cash)) : (pending ? (pending.type==="bonus"?t.pendBonus:t.pendBalance) : "");
   }else if(S.mode==="clinic"){
     delete document.querySelector(".lcd").dataset.say;
@@ -793,10 +932,10 @@ function render(){
   // bank cards
   $("bank").innerHTML = Object.keys(KIDS).map(code=>{
     const h = S.history.find(x=>x.kid===code);
-    const last = h ? (h.amount>0?"+":"")+h.amount+" ★  "+txLabel(h) : t.noTx;
-    return '<div class="card '+KIDS[code].cls+'" id="card'+code+'" data-say="bal_'+code+' n_'+S.balances[code]+'" data-fb="'+esc(t.balanceOf(kname(code))+' '+t.stars(S.balances[code]))+'"><span class="chipm" aria-hidden="true"></span>'+
+    const last = h ? (h.amount>0?"+":"")+fmt(h.amount, h.cur||"STAR")+"  "+txLabel(h) : t.noTx;
+    return '<div class="card '+KIDS[code].cls+'" id="card'+code+'" data-say="bal_'+code+' '+amt(S.balances[code]).join(" ")+'" data-fb="'+esc(t.balanceOf(kname(code))+' '+fmt(S.balances[code]))+'"><span class="chipm" aria-hidden="true"></span>'+
       '<div class="ctext"><div class="who">'+esc(kname(code))+'</div><div class="last">'+esc(last)+'</div></div>'+
-      '<div class="bal">'+S.balances[code]+' <span class="st">★</span></div></div>';
+      '<div class="bal">'+(S.currency==="STAR" ? S.balances[code] : fmtNum(S.balances[code]))+' <span class="st">'+C().sym[S.lang]+'</span></div></div>';
   }).join("");
 }
 function renderSide(){
@@ -805,15 +944,15 @@ function renderSide(){
     let m = "";
     if(mission){
       const done = mission.items.every(c=>mission.got.includes(c));
-      m = '<div class="mission"><div class="mt"><span>🎯 '+t.missionTitle+'</span><span>+'+MISSION_BONUS+' ★</span></div><div class="chips">'+
-        mission.items.map(c=>'<span class="chip-i '+(mission.got.includes(c)?"got":"")+'" data-say="p_'+c+'" data-fb="'+esc(pname(c))+'">'+PRODUCTS[c][0]+' '+esc(pname(c))+'</span>').join("")+'</div>'+
+      m = '<div class="mission"><div class="mt"><span>🎯 '+t.missionTitle+'</span><span>+'+esc(fmt(C().mission))+'</span></div><div class="chips">'+
+        mission.items.map(c=>'<span class="chip-i '+(mission.got.includes(c)?"got":"")+'" data-say="'+pSay(c)+'" data-fb="'+esc(pname(c))+'">'+pic(c)+' '+esc(pname(c))+'</span>').join("")+'</div>'+
         '<div class="small">'+(done?t.missionDone:t.missionHint)+'</div></div>';
     }
     const items = !cart.length ? '<li class="empty"><span class="ee">🧾</span><b>'+t.emptyBill+'</b><span>'+t.emptyBillHint+'</span></li>'
-      : cart.map((c,i)=>'<li class="'+(i===cart.length-1?"new":"")+'" data-say="p_'+c+' n_'+PRODUCTS[c][1]+'" data-fb="'+esc(pname(c))+'"><span class="e">'+PRODUCTS[c][0]+'</span><span class="n">'+esc(pname(c))+'</span><span class="p star">'+PRODUCTS[c][1]+'</span></li>').join("");
+      : cart.map((c,i)=>'<li class="'+(i===cart.length-1?"new":"")+'" data-say="'+[pSay(c)].concat(amt(priceOf(c))).join(" ")+'" data-fb="'+esc(pname(c)+" "+fmt(priceOf(c)))+'"><span class="e">'+pic(c)+'</span><span class="n">'+esc(pname(c))+'</span><span class="p">'+esc(fmt(priceOf(c)))+'</span></li>').join("");
     side.innerHTML = fx('<div class="rhead"><h2>'+t.receipt+'</h2><span class="rno">#'+String(S.receiptNo).padStart(4,"0")+'</span></div>'+
       '<div class="rsub">'+(cart.length?t.items(cart.length):"")+'</div>'+m+'<ul class="items" id="items">'+items+'</ul>'+
-      '<div class="sum" data-say="n_'+total()+'" data-fb="'+esc(t.stars(total()))+'"><span>'+t.sum+'</span><span>'+t.stars(total())+'</span></div>');
+      '<div class="sum" data-say="'+amt(total()).join(" ")+'" data-fb="'+esc(fmt(total()))+'"><span>'+t.sum+'</span><span>'+esc(fmt(total()))+'</span></div>');
     const it = $("items"); it.scrollTop = it.scrollHeight;
   }else if(S.mode==="clinic"){
     const list = Object.keys(PATIENTS).map(c=>{
@@ -852,7 +991,7 @@ function closeTicket(){
   clearTimeout(receiptTimer); if($("recOv").hidden) return;
   $("recOv").hidden = true; lastTicket = null; cart=[]; cash=0; S.receiptNo++; save(); render(); view(V.idle);
 }
-const ticketLines = snap => snap.map(c=>'<div><span>'+PRODUCTS[c][0]+' '+esc(pname(c))+'</span><span>'+PRODUCTS[c][1]+' ★</span></div>').join("");
+const ticketLines = snap => snap.map(c=>'<div><span>'+pic(c)+' '+esc(pname(c))+'</span><span>'+esc(fmt(priceOf(c)))+'</span></div>').join("");
 
 /* ================= Modes ================= */
 function setMode(m, talk){
@@ -863,7 +1002,7 @@ function setMode(m, talk){
   SFX.soft(); if(talk!==false) speak(["mode_"+m], T().say.mode[m]);
 }
 function newMission(){
-  const codes = shuffle(Object.keys(PRODUCTS).filter(c=>PRODUCTS[c][1]<=6)).slice(0,3);
+  const codes = shuffle(Object.keys(PRODUCTS).filter(c=>PRODUCTS[c][5]<=300)).slice(0,3);
   mission = {items:codes, got:cart.filter(c=>codes.includes(c))};
   SFX.ding(); render();
   view(V.msg("🎯", ()=>T().missionTitle, ()=>mission.items.map(c=>PRODUCTS[c][0]+" "+esc(pname(c))).join(" · ")));
@@ -877,7 +1016,7 @@ function startHunt(){
 
 /* ================= Scan handling ================= */
 const normalize = s => String(s).replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[۰-۹]/g,d=>"۰۱۲۳۴۵۶۷۸۹".indexOf(d)).replace(/\D/g,"");
-function log(kid, amount, what, n){ S.history.unshift({ts:Date.now(), kid, amount, what, n}); S.history = S.history.slice(0,60); save(); }
+function log(kid, amount, what, n){ S.history.unshift({ts:Date.now(), kid, amount, what, n, cur:S.currency}); S.history = S.history.slice(0,60); save(); }
 
 function handle(raw){
   const code = normalize(raw); if(!code || closed) return;
@@ -888,7 +1027,7 @@ function handle(raw){
   if(act && act.startsWith("m:")){ setMode(act.slice(2)); return; }
 
   // cards from another mode switch to it automatically
-  if(PRODUCTS[code] || BILLS[code] || act==="undo" || act==="mission" || act==="bonus" || act==="balance"){ if(S.mode!=="shop") setMode("shop", false); }
+  if(isProduct(code) || isEAN(code) || moneyCard(code) || act==="undo" || act==="mission" || act==="bonus" || act==="balance"){ if(S.mode!=="shop") setMode("shop", false); }
   if(PATIENTS[code] || MEDS[code]){ if(S.mode!=="clinic") setMode("clinic", false); }
   if(SPOTS[code]){ if(S.mode!=="treasure") setMode("treasure", false); }
 
@@ -897,72 +1036,86 @@ function handle(raw){
   handleShop(code, act);
 }
 
+function addToCart(code, fresh){
+  if(!$("recOv").hidden) closeTicket();
+  if(cash>0){ err(()=>T().payFirst, T().say.payFirst); return; }
+  cart.push(code);
+  let missionJustDone = false;
+  if(mission && mission.items.includes(code) && !mission.got.includes(code)){
+    mission.got.push(code); missionJustDone = mission.items.every(c=>mission.got.includes(c));
+  }
+  SFX.beep(); if(fresh) confetti(); render(); view(V.product(code, fresh));
+  if(missionJustDone){ setTimeout(()=>{ SFX.ding(); speak(["missionDone"], T().say.missionDone); }, 1500); }
+  const p = priceOf(code);
+  speak((fresh?["newProduct"]:[]).concat([pTok(code)], amt(p)), T().say.product(pname(code), p));
+}
+let lookingUp = false;
 function handleShop(code, act){
   const ticketOpen = !$("recOv").hidden;
-  if(PRODUCTS[code]){
-    if(ticketOpen) closeTicket();
-    if(cash>0){ err(()=>T().payFirst, T().say.payFirst); return; }
-    cart.push(code);
-    let missionJustDone = false;
-    if(mission && mission.items.includes(code) && !mission.got.includes(code)){
-      mission.got.push(code); missionJustDone = mission.items.every(c=>mission.got.includes(c));
-    }
-    SFX.beep(); render(); view(V.product(code));
-    if(missionJustDone){ setTimeout(()=>{ SFX.ding(); speak(["missionDone"], T().say.missionDone); }, 1500); }
-    speak(["p_"+code, "n_"+PRODUCTS[code][1]], T().say.product(pname(code), PRODUCTS[code][1]));
+  if(isProduct(code)){ addToCart(code, false); return; }
+  if(isEAN(code)){
+    if(lookingUp) return;
+    lookingUp = true; SFX.soft();
+    view(V.msg("🔍", ()=>T().searchingTxt), "pop"); speak(["searching"], T().searchingTxt);
+    addReal(code).then(()=>{ lookingUp = false; addToCart(code, true); }).catch(()=>{ lookingUp = false; });
     return;
   }
-  if(BILLS[code]){
+  const mc = moneyCard(code);
+  if(mc){
+    if(mc.cur !== S.currency){ if(ticketOpen) closeTicket(); err(()=>T().notCurrency(C(mc.cur).name[S.lang]), T().notCurrency(C(mc.cur).name[S.lang]), ["notCurrency"]); return; }
     if(ticketOpen) return;
     if(!cart.length){ err(()=>T().emptyBill, T().say.empty); return; }
-    const v = BILLS[code], sumV = total(); cash += v; SFX.coin();
+    const v = mc.v, sumV = total(); cash += v; SFX.coin();
     if(cash >= sumV){
       const change = cash - sumV, got = cash, snap = cart.slice();
       SFX.kaching(); confetti(); log(null, -sumV, "cash");
       openTicket(()=>'<div class="big-emoji" style="font-size:4.5rem">💵</div><div class="paid">'+T().paidCash+'</div>'+
-        '<div class="rlines">'+ticketLines(snap)+'<div class="strong"><span>'+T().sum+'</span><span>'+sumV+' ★</span></div>'+
-        '<div><span>'+T().received+'</span><span>'+got+' ★</span></div><div class="strong"><span>'+T().change+'</span><span>'+change+' ★</span></div></div>'+
+        '<div class="rlines">'+ticketLines(snap)+'<div class="strong"><span>'+T().sum+'</span><span>'+esc(fmt(sumV))+'</span></div>'+
+        '<div><span>'+T().received+'</span><span>'+esc(fmt(got))+'</span></div><div class="strong"><span>'+T().change+'</span><span>'+esc(fmt(change))+'</span></div></div>'+
         '<p class="change">'+(change>0 ? T().giveChange(T().stars(change)) : T().exact)+'</p>');
-      speak(change>0 ? ["thanksChange","n_"+change] : ["thanksExact"], T().say.cashDone(change));
+      speak(change>0 ? ["thanksChange"].concat(amt(change)) : ["thanksExact"], T().say.cashDone(change));
     }else{
       render(); view(V.msg("💵", ()=>T().recv(v), ()=>T().left(total()-cash)));
-      speak(["recv","n_"+v,"remaining","n_"+(sumV-cash),"toGo"], T().say.recv(v, sumV-cash));
+      speak(["recv"].concat(amt(v), ["remaining"], amt(sumV-cash), ["toGo"]), T().say.recv(v, sumV-cash));
     }
     return;
   }
   if(KIDS[code]){
     const nm = kname(code);
     if(pending && pending.type==="bonus"){
-      pending=null; S.balances[code]+=BONUS; log(code, BONUS, "bonus"); save(); render(); flashCard(code); SFX.kaching(); confetti();
-      view(V.msg("⭐", ()=>T().bonusFor(esc(kname(code))), null, ()=>"+"+BONUS)); speak(["bonus_"+code], T().say.bonus(nm));
+      const bn = C().bonus;
+      pending=null; S.balances[code]+=bn; log(code, bn, "bonus"); save(); render(); flashCard(code); SFX.kaching(); confetti();
+      view(V.msg("⭐", ()=>T().bonusFor(esc(kname(code))), null, ()=>"+"+fmt(bn)));
+      speak(S.currency==="STAR" ? ["bonus_"+code] : ["bonusm_"+code].concat(amt(bn)), T().say.bonus(nm));
       return;
     }
     if((pending && pending.type==="balance") || !cart.length){
       pending=null; render(); flashCard(code); SFX.soft();
-      view(V.msg("🏦", ()=>T().balanceOf(esc(kname(code))), null, ()=>S.balances[code])); speak(["bal_"+code, "n_"+S.balances[code]], T().say.balance(nm, S.balances[code]));
+      view(V.msg("🏦", ()=>T().balanceOf(esc(kname(code))), null, ()=>fmt(S.balances[code]))); speak(["bal_"+code].concat(amt(S.balances[code])), T().say.balance(nm, S.balances[code]));
       return;
     }
     if(ticketOpen) return;
     if(cash>0){ err(()=>T().cashStarted, T().say.cashStarted); return; }
     const sumV = total(), bal = S.balances[code];
-    if(bal < sumV){ flashCard(code); err(()=>T().notEnough(esc(kname(code)), sumV-bal), T().say.notEnough(nm, sumV-bal), ["ne_"+code, "n_"+(sumV-bal), "more"]); return; }
+    if(bal < sumV){ flashCard(code); err(()=>T().notEnough(esc(kname(code)), sumV-bal), T().say.notEnough(nm, sumV-bal), [(S.currency==="STAR"?"ne_":"nem_")+code].concat(amt(sumV-bal), ["more"])); return; }
     const missionOk = mission && mission.items.every(c=>mission.got.includes(c));
     S.balances[code] = bal - sumV; log(code, -sumV, "items", cart.length);
-    if(missionOk){ S.balances[code] += MISSION_BONUS; log(code, MISSION_BONUS, "mission"); mission = null; }
+    const mb = C().mission;
+    if(missionOk){ S.balances[code] += mb; log(code, mb, "mission"); mission = null; }
     save(); render(); flashCard(code); SFX.kaching(); confetti();
     const snap = cart.slice(), now = S.balances[code];
     openTicket(()=>'<div class="big-emoji" style="font-size:4.5rem">💳</div><div class="paid">'+T().paidCard+'</div><p><b>'+esc(T().cardOf(kname(code)))+'</b></p>'+
-      '<div class="rlines">'+ticketLines(snap)+'<div class="strong"><span>'+T().sum+'</span><span>'+sumV+' ★</span></div>'+
-      (missionOk?'<div><span>🎯 '+T().missionBonus+'</span><span>+'+MISSION_BONUS+' ★</span></div>':'')+
-      '<div><span>'+T().before+'</span><span>'+bal+' ★</span></div><div class="strong"><span>'+T().after+'</span><span>'+now+' ★</span></div></div>');
-    speak(["paid_"+code, "balanceNow", "n_"+now], T().say.paid(nm, now));
+      '<div class="rlines">'+ticketLines(snap)+'<div class="strong"><span>'+T().sum+'</span><span>'+esc(fmt(sumV))+'</span></div>'+
+      (missionOk?'<div><span>🎯 '+T().missionBonus+'</span><span>+'+esc(fmt(mb))+'</span></div>':'')+
+      '<div><span>'+T().before+'</span><span>'+esc(fmt(bal))+'</span></div><div class="strong"><span>'+T().after+'</span><span>'+esc(fmt(now))+'</span></div></div>');
+    speak(["paid_"+code, "balanceNow"].concat(amt(now)), T().say.paid(nm, now));
     return;
   }
   if(act==="undo"){
     if(cash>0){ err(()=>T().noUndoPaying, T().noUndoPaying); return; }
     const r = cart.pop(); if(!r){ err(()=>T().nothingToUndo, T().nothingToUndo); return; }
     if(mission && !cart.includes(r)) mission.got = mission.got.filter(c=>c!==r);
-    SFX.soft(); render(); view(V.msg("↩️", ()=>T().removed(esc(pname(r))))); speak(["removed","p_"+r], T().say.removed(pname(r)));
+    SFX.soft(); render(); view(V.msg("↩️", ()=>T().removed(esc(pname(r))))); speak(["removed", pTok(r)], T().say.removed(pname(r)));
     return;
   }
   if(act==="clear"){
@@ -1040,7 +1193,7 @@ document.addEventListener("click", e=>{
   if(!el || e.target.closest("button")) return;
   if(!$("startOv").hidden) return;
   audio();
-  const toks = el.dataset.say.split(" ").filter(Boolean);
+  const toks = el.dataset.say.split(" ").filter(Boolean).map(k=>k==="null" ? null : (k.startsWith("t:") ? "t:"+decodeURIComponent(k.slice(2)) : k));
   speak(toks, el.dataset.fb || (el.dataset.say==="welcome" ? T().say.welcome : ""));
   el.classList.remove("said"); void el.offsetWidth; el.classList.add("said");
 });
@@ -1097,7 +1250,7 @@ scanIn.style.cssText = "position:fixed;left:0;bottom:0;width:1px;height:1px;opac
 document.body.appendChild(scanIn);
 scanIn.addEventListener("input", ()=>{ const v = scanIn.value; scanIn.value = ""; if(v) pushDigits(v); });
 function focusScan(){ if($("panelOv").hidden && document.activeElement !== scanIn){ try{ scanIn.focus({preventScroll:true}); }catch(e){} } }
-document.addEventListener("pointerup", ()=>setTimeout(focusScan, 0));
+document.addEventListener("pointerup", focusScan);   /* synchronous: iOS only allows focus inside the tap itself */
 scanIn.addEventListener("blur", ()=>setTimeout(focusScan, 300));
 let scanFlashT = null;
 function noteScan(){ const d = document.querySelector(".sign"); if(d){ d.classList.remove("said"); void d.offsetWidth; d.classList.add("said"); } }
@@ -1163,21 +1316,28 @@ function renderPanel(){
   $("pTime").textContent=t.pTime; $("reopenBtn").textContent=t.reopen;
   $("pSound").textContent=t.pSound; $("pCodes").textContent=t.pCodes; $("pHist").textContent=t.pHist; $("closePanel").textContent=t.back;
   $("lbl9001").textContent = kname("9001"); $("lbl9002").textContent = kname("9002");
-  $("bal9001").value = S.balances["9001"]; $("bal9002").value = S.balances["9002"];
+  const dv = v => C().dec ? (v/100).toFixed(2) : v;
+  $("bal9001").value = dv(S.balances["9001"]); $("bal9002").value = dv(S.balances["9002"]);
+  $("bal9001").step = $("bal9002").step = C().dec ? "0.01" : "1";
+  $("pMoney").textContent = t.pMoney; $("simpleLbl").textContent = t.simplePrices; $("rateNote").textContent = t.rateNote;
+  $("curSel").innerHTML = Object.keys(CUR).map(k=>'<option value="'+k+'"'+(k===S.currency?" selected":"")+'>'+CUR[k].flag+" "+CUR[k].name[S.lang]+(k==="STAR"?"":" ("+CUR[k].sym[S.lang]+")")+'</option>').join("");
+  $("simpleChk").checked = !!S.simple; $("simpleChk").disabled = !C().dec;
+  $("pReal").textContent = t.pReal; $("realInfo").textContent = t.realInfo; $("exportBtn").textContent = t.exportBtn; $("importTxt").textContent = t.importBtn;
+  renderReal();
   $("limitSel").innerHTML = [0,15,30,45,60].map(n=>'<option value="'+n+'"'+(S.limit===n?" selected":"")+'>'+(n?t.limitMin(n):t.limitOff)+'</option>').join("");
   $("timeInfo").textContent = S.limit && sessionStart ? t.timeLeft(Math.max(0, Math.ceil((S.limit*60000-(Date.now()-sessionStart))/60000))) : t.timeOff;
   $("voiceBtn").textContent = S.voice ? t.voiceOn : t.voiceOff; $("sfxBtn").textContent = S.sfx ? t.sfxOn : t.sfxOff;
   renderVoiceInfo(); renderFamily();
   $("ctrlList").innerHTML = Object.entries(CTRL).map(([c,a])=>'<b>'+c+'</b><span>'+t.ctrl[a]+'</span>').join("")+
-    '<b>9001 / 9002</b><span>'+t.rows.cards+'</span><b>7001–7020</b><span>'+t.rows.bills+'</span><b>1001–1020</b><span>'+t.rows.prod+'</span>'+
+    '<b>9001 / 9002</b><span>'+t.rows.cards+'</span><b>7001–7020</b><span>'+t.rows.bills+'</span><b>71xxxxx–76xxxxx</b><span>'+t.moneyRow+'</span><b>1001–1020</b><span>'+t.rows.prod+'</span><b>EAN-8 / EAN-13</b><span>'+t.realRow+'</span>'+
     '<b>3001–3006</b><span>'+t.rows.pat+'</span><b>4001–4008</b><span>'+t.rows.med+'</span><b>5001–5010</b><span>'+t.rows.spot+'</span>';
   $("histList").innerHTML = S.history.length ? S.history.slice(0,10).map(h=>{
     const time = new Date(h.ts).toLocaleTimeString(S.lang+"-u-nu-latn",{hour:"2-digit",minute:"2-digit"});
-    return time+" · "+esc(h.kid?kname(h.kid):t.txCash)+" · "+(h.amount>0?"+":"")+h.amount+" ★ · "+txLabel(h);
+    return time+" · "+esc(h.kid?kname(h.kid):t.txCash)+" · "+(h.amount>0?"+":"")+esc(fmt(h.amount, h.cur||"STAR"))+" · "+txLabel(h);
   }).join("<br>") : t.noTx;
   resetUI(false);
 }
-$("quickCodes").innerHTML = ["1001","1011","9001","7005","8030","3001","4002","4004","5001"].map(c=>'<button class="ghost" type="button" data-code="'+c+'">'+c+'</button>').join("");
+$("quickCodes").innerHTML = ["1001","1011","9001","7101000","7100200","8030","3017620422003","3001","4002","5001"].map(c=>'<button class="ghost" type="button" data-code="'+c+'">'+c+'</button>').join("");
 $("quickCodes").addEventListener("click", e=>{ const c = e.target.dataset && e.target.dataset.code; if(c){ closePanel(); if(!$("startOv").hidden) startGame(); handle(c); } });
 function openPanel(){ renderPanel(); $("panelOv").hidden = false; }
 function holdToOpen(btn, wrap){
@@ -1229,12 +1389,57 @@ $("closePanel").onclick = closePanel;
 $("manualBtn").onclick = ()=>{ const v = $("manualCode").value; $("manualCode").value = ""; closePanel(); if(!$("startOv").hidden) startGame(); handle(v); };
 $("manualCode").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); $("manualBtn").click(); } });
 $("saveBal").onclick = ()=>{
-  const f = parseInt($("bal9001").value,10), s = parseInt($("bal9002").value,10);
+  const rd = x => { const n = parseFloat(String(x).replace(",", ".")); return isNaN(n) ? NaN : Math.round(C().dec ? n*100 : n); };
+  const f = rd($("bal9001").value), s = rd($("bal9002").value);
   if(isNaN(f)||isNaN(s)||f<0||s<0){ toast(T().badNum); return; }
   S.balances["9001"]=f; S.balances["9002"]=s; save(); render(); toast(T().saved);
 };
 $("limitSel").onchange = e=>{ S.limit = +e.target.value; save(); if(!sessionStart) sessionStart = Date.now(); renderPanel(); };
 $("reopenBtn").onclick = ()=>{ reopen(); renderPanel(); };
+function setCurrency(nc){
+  const oc = S.currency; if(nc===oc || !CUR[nc]) return;
+  const o = CUR[oc], n = CUR[nc];
+  Object.keys(S.balances).forEach(k=>{ const eur = (o.dec ? S.balances[k]/100 : S.balances[k]) / o.rate; const maj = eur * n.rate;
+    S.balances[k] = Math.max(0, n.dec ? Math.round(maj*10)*10 : Math.round(maj)); });
+  S.currency = nc; cart = []; cash = 0; mission = null; pending = null; save();
+  render(); view(modeIdleView()); toast(T().currencySet(n.flag+" "+n.name[S.lang]));
+}
+$("curSel").onchange = e=>{ setCurrency(e.target.value); renderPanel(); };
+$("simpleChk").onchange = e=>{ S.simple = e.target.checked; save(); render(); };
+function renderReal(){
+  const t = T(), codes = Object.keys(REAL).sort((a,b)=>(REAL[b].added||0)-(REAL[a].added||0));
+  $("realList").innerHTML = codes.length ? codes.map(c=>{ const r = REAL[c], p = priceOf(c);
+    return '<div class="realrow" data-code="'+c+'">'+(r.img?'<img src="'+esc(r.img)+'" alt="">':'<span class="ri">📦</span>')+
+      '<div><input type="text" data-f="name" value="'+esc(pname(c))+'" aria-label="name"><div class="code">'+c+(r.brand?' · '+esc(r.brand):'')+'</div></div>'+
+      '<input type="number" data-f="price" min="0" step="'+(C().dec?"0.01":"1")+'" value="'+(C().dec ? (p/100).toFixed(2) : p)+'" aria-label="price">'+
+      '<button class="ghost danger" type="button" data-f="del">'+t.delBtn+'</button></div>'; }).join("")
+    : '<p class="small">'+t.noReal+'</p>';
+}
+$("realList").addEventListener("change", async e=>{
+  const row = e.target.closest(".realrow"); if(!row) return; const c = row.dataset.code, r = REAL[c]; if(!r) return;
+  if(e.target.dataset.f==="name"){ r.names[S.lang] = e.target.value.trim() || r.names[S.lang]; }
+  if(e.target.dataset.f==="price"){ const n = parseFloat(String(e.target.value).replace(",", ".")); if(!isNaN(n) && n>=0) r.base = baseFromPrice(Math.round(C().dec ? n*100 : n)); }
+  await catPut(r); render();
+});
+$("realList").addEventListener("click", async e=>{
+  const b = e.target.closest('[data-f="del"]'); if(!b) return; const c = b.closest(".realrow").dataset.code;
+  await catDel(c); cart = cart.filter(x=>x!==c); render(); renderReal();
+});
+$("exportBtn").onclick = ()=>{
+  const data = { app:"dukkan", schema:1, exported:new Date().toISOString(), catalog:Object.values(REAL),
+    state:{ balances:S.balances, currency:S.currency, simple:S.simple, history:S.history, healed:S.healed } };
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], {type:"application/json"}));
+  a.download = "dukkan-backup-"+new Date().toISOString().slice(0,10)+".json"; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+};
+$("importFile").onchange = async e=>{
+  const f = e.target.files && e.target.files[0]; if(!f) return;
+  try{ const d = JSON.parse(await f.text()); const list = Array.isArray(d.catalog) ? d.catalog : [];
+    for(const r of list){ if(r && r.code) await catPut(r); }
+    if(d.state && d.state.currency && CUR[d.state.currency]){ Object.assign(S, {balances:d.state.balances||S.balances, currency:d.state.currency, simple:!!d.state.simple}); save(); }
+    toast(T().imported(list.length)); render(); renderPanel();
+  }catch(err){ toast(T().badNum); }
+  e.target.value = "";
+};
 $("voiceBtn").onclick = ()=>{ S.voice=!S.voice; save(); renderPanel(); };
 $("sfxBtn").onclick = ()=>{ S.sfx=!S.sfx; save(); renderPanel(); };
 function resetUI(confirming){
@@ -1243,7 +1448,7 @@ function resetUI(confirming){
     ? '<span>'+t.resetAsk+'</span><button class="ghost danger" type="button" id="resetYes">'+t.resetYes+'</button><button class="ghost" type="button" id="resetNo">'+t.cancel+'</button>'
     : '<button class="ghost danger" type="button" id="resetBtn">'+t.reset+'</button>';
   if(confirming){
-    $("resetYes").onclick = ()=>{ const keep={voice:S.voice,sfx:S.sfx,lang:S.lang,mode:S.mode,limit:S.limit,clues:S.clues}; S = Object.assign(defaults(), keep); save();
+    $("resetYes").onclick = ()=>{ const keep={voice:S.voice,sfx:S.sfx,lang:S.lang,mode:S.mode,limit:S.limit,clues:S.clues,currency:S.currency,simple:S.simple}; S = Object.assign(defaults(), keep); S.balances = {"9001":C().start,"9002":C().start}; save();
       cart=[]; cash=0; pending=null; mission=null; clinic=null; hunt=null; render(); view(modeIdleView()); renderPanel(); toast(T().resetDone); };
     $("resetNo").onclick = ()=>resetUI(false);
   } else $("resetBtn").onclick = ()=>resetUI(true);
@@ -1251,7 +1456,9 @@ function resetUI(confirming){
 
 /* ================= Boot ================= */
 document.querySelectorAll(".welcome .big-emoji, .moon, .sign .logo").forEach(el=>{ el.innerHTML = fx(el.innerHTML); });
+if(migrateStars){ setCurrency("EUR"); }
 lastView = modeIdleView(); applyLang(); drawView("");
+catLoad().then(()=>{ render(); });
 if("serviceWorker" in navigator && location.protocol==="https:" && /github\.io$/.test(location.hostname)){
   navigator.serviceWorker.register("sw.js").catch(()=>{});
 }
