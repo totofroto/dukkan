@@ -5,10 +5,10 @@ Static PWA (single `index.html`), GitHub Pages. Voices in `voice/<lang>/<key>.mp
 Print kits in `kit/`. Tools in `tools/`.
 
 ## Active Handoff
-**Owner:** Antigravity (on the Mac mini) · **Date:** 2026-10-22
-
-**Status:** Completed. All 1167 clips regenerated with Gemini TTS voice (Achird for ar, en, de) and published to voice/.
-Service worker cache version incremented and deployed.
+| Date | From → To | Status | Task / Notes |
+|---|---|---|---|
+| 2026-11-03 | Antigravity → Tareg | ✅ done | All 1167 clips regenerated with natural Gemini TTS voice (Achird for ar, en, de) across all languages. Published to `voice/`, bumped service worker cache in `sw.js` (offline ready), and pushed to GitHub main. |
+| 2026-10-22 | Claude → Antigravity | ✅ done | Handed off task to replace all game voice clips with Gemini TTS voices. |
 
 ## History
 - v3 shop/clinic/treasure · v4 neural voices, 3D icons, offline, parent lock · v5 tap-to-hear, scanner input fixes
